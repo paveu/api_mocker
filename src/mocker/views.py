@@ -20,6 +20,7 @@ def home(request):
     """
     return render(request, "home.html", {'form': MockerForm()})
 
+
 def job_post_view(request):
     """
     job post view
@@ -37,7 +38,7 @@ def job_post_view(request):
         context = {
                   "destination_url": form_mock.destination_address,
                   "mocked_url": mocked_url,
-                  "action_msg": "Thanks for submitting the job!"
+                  "action_msg": "Thanks for mocki API!"
                   }
        
         messages.success(request, "Operation completed")
@@ -67,6 +68,7 @@ def get_short_id():
 @csrf_exempt
 def mocked_api_view(request, short_id):
     """
+    Perfornming HTTP operation on API mocked http address
     """
     mock_obj = Mocker.objects.get(short_id=short_id)
     
@@ -88,20 +90,18 @@ def mocked_api_view(request, short_id):
                 if r.status_code == requests.codes.ok:
                     return JsonResponse(json.dumps(r.json()), safe=False, status=200)
                 else:
-                    return JsonResponse({}, status=406)
+                    return JsonResponse({"status": "Error: Not Acceptable"}, status=406)
 
             elif request.method == "POST":
                 r = requests.post(url, headers=headers)
                 if r.status_code == requests.codes.ok:
                     return JsonResponse(json.dumps(r.json()), safe=False, status=200)
                 else:
-                    return JsonResponse({}, status=406)
+                    return JsonResponse({"status": "Error: Not Acceptable"}, status=406)
         else:
             if str(requested_content_type) == 'text/plain':
                 messages.warning(request, "Content type: text/plain is not allowed")
                 return render(request, "error.html",{})
-            #TODO: raise error
-            print("Requested content type is not allowed")
+        return JsonResponse({"status": "Requested content type is not allowed"}, status=403)
     else:
-        #TODO: raise error
-        print("Requested HTTP method is not allowed")
+        return JsonResponse({"status": "Requested HTTP method is not allowed"}, status=405)
