@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+
+{% block container %}
+	{% for message in messages %}
+	<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+	{% endfor %}   
+
+    <a href="{% url 'home' %}">Go to the Home page</a>
+
+{% endblock %}
