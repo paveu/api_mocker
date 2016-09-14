@@ -82,21 +82,17 @@ def mocked_api_view(request, short_id):
             headers = {'Content-type': str(requested_content_type)}
 
             if request.method == "GET":
-                r = requests.get(url, headers=headers)
-                if r.status_code == requests.codes.ok:
-                    
-                    # Check if there is callback api defined
-                    
-                    return JsonResponse(json.dumps(r.json()), safe=False, status=200)
-                else:
-                    return JsonResponse({"status": "Error: Not Acceptable"}, status=406)
-
-            elif request.method == "POST":
-                r = requests.post(url, headers=headers)
-                if r.status_code == requests.codes.ok:
-                    return JsonResponse(json.dumps(r.json()), safe=False, status=200)
-                else:
-                    return JsonResponse({"status": "Error: Not Acceptable"}, status=406)
+                try:
+                    r = requests.get(url, headers=headers)
+                    if r.status_code == requests.codes.ok:
+                        
+                        # Check if there is callback api defined
+                        
+                        return JsonResponse(json.dumps(r.json()), safe=False, status=200)
+                    else:
+                        return JsonResponse({"status": "Error: Not Acceptable"}, status=406)
+                except:
+                    return JsonResponse({"status": "A serious problem happened."}, status=500)
         else:
             if str(requested_content_type) == 'text/plain':
                 messages.warning(request, "Content type: text/plain is not allowed")
