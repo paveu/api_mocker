@@ -133,4 +133,4 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 SHORT_URL_MAX_LEN = 6
 
-HOSTNAME = 'https://mock-pawelste.c9users.io'
+HOSTNAME = 'http://mock-pawelste.c9users.io'

@@ -8,8 +8,8 @@
 	
     <h3>{{ action_msg|linebreaksbr }}</h3>
     <ul>
-        <li><a href="{{ destination_url }}">{{ destination_url }}</a></li>
-        <li><a href="{{ mocked_url }}">{{ mocked_url }}</a></li>
+        <li>Original API address: <a href="{{ destination_url }}">{{ destination_url }}</a></li>
+        <li>Mocked API address: <a href="{{ mocked_url }}"> {{ mocked_url }}</a></li>
     </ul>
     
     <a href="{% url 'home' %}">Go to the Home page</a>

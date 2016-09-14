@@ -58,30 +58,35 @@ class Mocker(DefaultModel):
     
     destination_address = models.URLField(
         max_length=200,
-        verbose_name='Destination address to be mocked')
+        verbose_name='Destination API to be mocked')
     # http_method = models.ManyToManyField(HTTP_Method, verbose_name='Allowed HTTP methods for mocked address')
     http_method = models.CharField(
-        verbose_name='Allowed HTTP method for an adress to be mocked',
+        verbose_name='Allowed HTTP method for an API to be mocked',
         max_length=256,
         choices=HTTP_METHOD_CHOICES)
 
     destination_content_type = models.CharField(
-        verbose_name='Allowed content type for address to be mocked',
+        verbose_name='Allowed content type for an API to be mocked',
         max_length=256,
         choices=CONTENT_TYPE_CHOICES)
     return_address = models.URLField(
         max_length=200,
-        verbose_name='Callback address for sending pushed return message',
+        verbose_name='Callback API',
         blank=True,
         null=True)
     return_content_type = models.CharField(
-        verbose_name='Callback content type',
+        verbose_name='Callback API content type',
         max_length=256,
         choices=CONTENT_TYPE_CHOICES)
     short_id = models.CharField(
-        verbose_name='Short ID',
-        max_length=256)
-
+        verbose_name='Hashed ID',
+        max_length=128)
+    mocked_address = models.URLField(
+        max_length=200,
+        verbose_name='Mocked API Address',
+        blank=True,
+        null=True)
+        
     class Meta:
         verbose_name = 'Mocked API'
         verbose_name_plural = 'Mocked APIs'
