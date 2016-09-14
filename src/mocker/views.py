@@ -77,33 +77,31 @@ def mocked_api_view(request, short_id):
     url = request.build_absolute_uri()
     params = url[url.find(short_id)+len(short_id)+1:]
     requested_content_type = request.content_type
-    #print("params", params)
-    #print("requested_content_type", requested_content_type)
-    #print("request.method", request.method)
-    #print("request.method", request.method)
-    #print("allowed_http_method", allowed_http_method)
-    if request.method != allowed_http_method:
-        #TODO: raise error
-        print("Requested HTTP method is not allowed")
-    else:
-        url = ''.join([destination_address, params])
-        headers = {'Content-type': str(requested_content_type)}
-        if requested_content_type != str(allowed_content_type):
-            if str(requested_content_type) == 'text/plain':
-                messages.warning(request, "Content type: text/plain is not allowed")
-                return render(request, "api_lookup.html",{})
-            #TODO: raise error
-            print("Requested content type is not allowed")
-        else:
+
+    if request.method == allowed_http_method:
+        if requested_content_type == str(allowed_content_type):
+            url = ''.join([destination_address, params])
+            headers = {'Content-type': str(requested_content_type)}
+
             if request.method == "GET":
                 r = requests.get(url, headers=headers)
                 if r.status_code == requests.codes.ok:
                     return JsonResponse(json.dumps(r.json()), safe=False, status=200)
                 else:
                     return JsonResponse({}, status=406)
+
             elif request.method == "POST":
                 r = requests.post(url, headers=headers)
                 if r.status_code == requests.codes.ok:
                     return JsonResponse(json.dumps(r.json()), safe=False, status=200)
                 else:
                     return JsonResponse({}, status=406)
+        else:
+            if str(requested_content_type) == 'text/plain':
+                messages.warning(request, "Content type: text/plain is not allowed")
+                return render(request, "error.html",{})
+            #TODO: raise error
+            print("Requested content type is not allowed")
+    else:
+        #TODO: raise error
+        print("Requested HTTP method is not allowed")
