@@ -46,7 +46,7 @@ def job_post_view(request):
 
 def get_hashed_id():
     """
-    This will generate unique mshort ID for mocking API
+    This will generate unique hashed ID for mocking API
     """
     length = settings.SHORT_URL_MAX_LEN
     char = string.ascii_uppercase + string.digits + string.ascii_lowercase
