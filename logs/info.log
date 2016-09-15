@@ -5878,3 +5878,4 @@ INFO:root:Destination API: http://jsonplaceholder.typicode.com/posts/?format=jso
     "body": "cupiditate quo est a modi nesciunt soluta\nipsa voluptas error itaque dicta in\nautem qui minus magnam et distinctio eum\naccusamus ratione error aut"
   }
 ]
+WARNING:django.request:Not Found: /favicon.ico
