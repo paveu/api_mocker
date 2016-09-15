@@ -698,4 +698,3 @@ INFO:root:Destination API: https://flask-app-pawelste.c9users.io/restapis/?forma
 }
 
 INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): jsonplaceholder.typicode.com
-WARNING:django.request:Not Found: /r1RqbY/asdasdasd/
