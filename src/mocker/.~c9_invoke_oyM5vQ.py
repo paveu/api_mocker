@@ -71,14 +71,8 @@ def process_request(short_id,
                         response = make_callback(short_id, data=r)
                         #TODO: add handler for status codes
                         print("callback status_code", response)
-                    logging.info("Destination API: %s, response: %s" % (url, r.text))
-                    try:
-                        data = r.json()
-                        status_code = r.status_code
-                    except ValueError:
-                        data = {'status': 'No JSON object could be decoded'}
-                        status_code = 500
-                    return JsonResponse(json.dumps(data), safe=False, status=status_code)
+                    logging.info("Destination API: %s, response: %s" % (url, str(r.content)))
+                    return JsonResponse(json.dumps(r.json()), safe=False, status=r.status_code)
                 else:
                     return JsonResponse({"status": "Something went wrong"}, status=r.status_code)
         else:
