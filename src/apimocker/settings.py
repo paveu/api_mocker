@@ -131,6 +131,6 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 SHORT_URL_MAX_LEN = 6
 
-HOSTNAME = 'http://mock-pawelste.c9users.io'
+HOSTNAME = 'https://mock-pawelste.c9users.io/'
 
 LOGFILE_INFO = os.path.join(os.path.dirname(BASE_DIR), "logs", "info.log")
