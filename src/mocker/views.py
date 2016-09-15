@@ -61,7 +61,7 @@ def get_hashed_id():
 @csrf_exempt
 def mocked_api_view(request, short_id):
     """
-    Perfornming HTTP based on incoming request. It uses short_id to recognize
+    Processing mocked API based on incoming request. It uses short_id to recognize
     mocked API address
     """
 
