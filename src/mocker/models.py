@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.db import models
  
 
-
 class DefaultModel(models.Model):
     creation_date = models.DateTimeField(verbose_name='Creation date',
                                          auto_now_add=True,
@@ -20,8 +19,8 @@ class Mocker(DefaultModel):
     HTTP_METHOD_CHOICES = (
         ('POST', 'POST'),
         ('GET', 'GET'),
-        # ('PATCH', 'PATCH'),
-        # ('DELETE', 'DELETE')
+        ('PATCH', 'PATCH'),
+        ('PUT', 'PUT'),
         )
     CONTENT_TYPE_CHOICES = (
         ('application/json', 'application/json'),
@@ -39,7 +38,6 @@ class Mocker(DefaultModel):
     destination_address = models.URLField(
         max_length=200,
         verbose_name='Destination API address to be mocked')
-    # http_method = models.ManyToManyField(HTTP_Method, verbose_name='Allowed HTTP methods for mocked address')
     http_method = models.CharField(
         verbose_name='Allowed HTTP method for a mocked API',
         max_length=256,
@@ -56,7 +54,9 @@ class Mocker(DefaultModel):
     return_content_type = models.CharField(
         verbose_name='Callback API content type',
         max_length=256,
-        choices=CONTENT_TYPE_CHOICES)
+        choices=CONTENT_TYPE_CHOICES,
+        blank=True,
+        null=True)
     short_id = models.CharField(
         verbose_name='Hashed ID',
         max_length=128)
