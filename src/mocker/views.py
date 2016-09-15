@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from .forms import MockerForm
 from .models import Mocker
-
+from .utils import make_callback
 
 def home(request):
     """
@@ -66,33 +66,38 @@ def mocked_api_view(request, short_id):
     """
     Perfornming HTTP operations on mocked API
     """
-    mock_obj = Mocker.objects.get(short_id=short_id)
+    mock = Mocker.objects.get(short_id=short_id)
     
-    destination_address = mock_obj.destination_address
-    allowed_http_method = mock_obj.http_method
-    allowed_content_type = mock_obj.destination_content_type
-    
+    destination_address = mock.destination_address
+    callback_api = mock.return_address
+    return_content_type = mock.return_content_type
+
+    allowed_http_method = mock.http_method
+    allowed_content_type = mock.destination_content_type
+
     url = request.build_absolute_uri()
+    print("url", request.build_absolute_uri())
     params = url[url.find(short_id)+len(short_id)+1:]
     requested_content_type = request.content_type
 
+    # check if http method is allowed
     if request.method == allowed_http_method:
+        # check if content_type is allowed
         if requested_content_type == str(allowed_content_type):
             url = ''.join([destination_address, params])
-            headers = {'Content-type': str(requested_content_type)}
 
             if request.method == "GET":
-                try:
-                    r = requests.get(url, headers=headers)
+                forced_format = request.GET.get('format','')
+                if requested_content_type == 'application/json' or forced_format == "json":
+                    destination_header = {'Content-type': str(requested_content_type)}
+                    r = requests.get(url, headers=destination_header)
                     if r.status_code == requests.codes.ok:
-                        
-                        # Check if there is callback api defined
-                        
-                        return JsonResponse(json.dumps(r.json()), safe=False, status=200)
+                        if callback_api:
+                            make_callback(callback_api, return_content_type, data=json.dumps(r.json()))
+                        return JsonResponse(json.dumps(r.json()), safe=False, status=r.status_code)
                     else:
-                        return JsonResponse({"status": "Error: Not Acceptable"}, status=406)
-                except:
-                    return JsonResponse({"status": "A serious problem happened."}, status=500)
+                        return JsonResponse({"status": "Error"}, status=r.status_code)
+
         else:
             if str(requested_content_type) == 'text/plain':
                 messages.warning(request, "Content type: text/plain is not allowed")

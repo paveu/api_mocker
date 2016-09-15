@@ -16,31 +16,11 @@ class DefaultModel(models.Model):
     class Meta:
         abstract = True
 
-# class HTTP_Method(models.Model):
-#     HTTP_METHOD_CHOICES = (
-#         ('POST', 'POST'),
-#         ('GET', 'GET'),
-#         ('PATCH', 'PATCH'),
-#         ('DELETE', 'DELETE')
-#         )
-
-#     method = models.CharField(
-#         verbose_name='HTTP method',
-#         max_length=128,
-#         choices=HTTP_METHOD_CHOICES)
-
-#     class Meta:
-#         verbose_name = 'HTTP Method'
-#         verbose_name_plural = 'HTTP Methods'
-
-#     def __unicode__(self):
-#         return self.method
-     
 class Mocker(DefaultModel):
     HTTP_METHOD_CHOICES = (
-        # ('POST', 'POST'),
+        ('POST', 'POST'),
         ('GET', 'GET'),
-        # ('PATCH', 'PATCH'),
+        ('PATCH', 'PATCH'),
         # ('DELETE', 'DELETE')
         )
     CONTENT_TYPE_CHOICES = (
@@ -58,20 +38,19 @@ class Mocker(DefaultModel):
     
     destination_address = models.URLField(
         max_length=200,
-        verbose_name='Destination API to be mocked')
+        verbose_name='Destination API address to be mocked')
     # http_method = models.ManyToManyField(HTTP_Method, verbose_name='Allowed HTTP methods for mocked address')
     http_method = models.CharField(
         verbose_name='Allowed HTTP method for an API to be mocked',
         max_length=256,
         choices=HTTP_METHOD_CHOICES)
-
     destination_content_type = models.CharField(
         verbose_name='Allowed content type for an API to be mocked',
         max_length=256,
         choices=CONTENT_TYPE_CHOICES)
     return_address = models.URLField(
         max_length=200,
-        verbose_name='Callback API',
+        verbose_name='Callback API address',
         blank=True,
         null=True)
     return_content_type = models.CharField(
