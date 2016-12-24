@@ -1,6 +1,4 @@
 from __future__ import unicode_literals
-
-from django.contrib.auth.models import User
 from django.db import models
  
 
@@ -16,7 +14,7 @@ class DefaultModel(models.Model):
         abstract = True
 
 class Mocker(DefaultModel):
-    HTTP_METHOD_CHOICES = (
+    allowed_http_method_CHOICES = (
         ('POST', 'POST'),
         ('GET', 'GET'),
         ('PATCH', 'PATCH'),
@@ -35,29 +33,29 @@ class Mocker(DefaultModel):
         # ('text/xml', 'text/xml'),
     )
     
-    destination_address = models.URLField(
+    original_destination_address = models.URLField(
         max_length=200,
         verbose_name='Destination API address to be mocked')
-    http_method = models.CharField(
+    allowed_http_method = models.CharField(
         verbose_name='Allowed HTTP method for a mocked API',
         max_length=256,
-        choices=HTTP_METHOD_CHOICES)
-    destination_content_type = models.CharField(
+        choices=allowed_http_method_CHOICES)
+    allowed_destination_content_type = models.CharField(
         verbose_name='Allowed content type for a mocked API',
         max_length=256,
         choices=CONTENT_TYPE_CHOICES)
-    return_address = models.URLField(
+    callback_address = models.URLField(
         max_length=200,
         verbose_name='Callback API address',
         blank=True,
         null=True)
-    return_content_type = models.CharField(
+    callback_content_type = models.CharField(
         verbose_name='Callback API content type',
         max_length=256,
         choices=CONTENT_TYPE_CHOICES,
         blank=True,
         null=True)
-    short_id = models.CharField(
+    hashed_id = models.CharField(
         verbose_name='Hashed ID',
         max_length=128)
     mocked_address = models.URLField(

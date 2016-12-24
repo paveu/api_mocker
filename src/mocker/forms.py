@@ -8,11 +8,11 @@ from .models import Mocker
 class MockerForm(forms.ModelForm):
     class Meta:
         model = Mocker
-        fields = ['destination_address',
-            'http_method',
-            'destination_content_type',
-            'return_address',
-            'return_content_type',
+        fields = ['original_destination_address',
+            'allowed_http_method',
+            'allowed_destination_content_type',
+            'callback_address',
+            'callback_content_type',
             ]
 
     def __init__(self, *args, **kwargs):
@@ -26,4 +26,5 @@ class MockerForm(forms.ModelForm):
                 HTML("""<a role="button" class="btn btn-default"
                         href="{% url "home" %}">Cancel</a>"""),
                 Submit('save', 'Submit'),
-                ))
+                )
+        )

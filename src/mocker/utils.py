@@ -1,12 +1,13 @@
-import requests
 import json
 import logging
+import requests
+import random
+import string
 from django.conf import settings
 from django.http import JsonResponse
 
 from .models import Mocker
 
-logging.basicConfig(filename=settings.LOGFILE_INFO, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -17,71 +18,74 @@ def get_hashed_id():
     length = settings.SHORT_URL_MAX_LEN
     char = string.ascii_uppercase + string.digits + string.ascii_lowercase
     while True:
-        short_id = ''.join(random.choice(char) for x in range(length))
+        hashed_id = ''.join(random.choice(char) for x in range(length))
         try:
-            temp = Mocker.objects.get(short_id=short_id)
+            temp = Mocker.objects.get(hashed_id=hashed_id)
         except:
-            return short_id
+            return hashed_id
 
 
-def make_callback(short_id, data):
+def make_callback(hashed_id, data):
     """
     Make callback API
     """
 
-    mock = Mocker.objects.get(short_id=short_id)
-    callback_api = mock.return_address
-    return_content_type = mock.return_content_type
+    mock = Mocker.objects.get(hashed_id=hashed_id)
+    callback_api = mock.callback_address
+    callback_content_type = mock.callback_content_type
+
     try:
         data = json.dumps(data.json())
     except ValueError:
         data = {'status': 'No JSON object could be decoded'}
-    if return_content_type == 'application/json':
-        callback_header = {'Content-type': str(return_content_type)}
+
+    if callback_content_type == 'application/json':
+        callback_header = {'Content-type': str(callback_content_type)}
         callback = requests.post(callback_api, data=data, headers=callback_header)
         return callback.status_code
 
-def process_request(short_id,
-                    requested_http_method,
+
+def process_request(hashed_id,
+                    requested_allowed_http_method,
                     requested_content_type,
                     absolute_uri,
                     forced_format):
     """
     Perfornming HTTP operations on mocked API
     """
-    mock = Mocker.objects.get(short_id=short_id)
+    mock = Mocker.objects.get(hashed_id=hashed_id)
     
-    destination_address = mock.destination_address
-    callback_api = mock.return_address
+    original_destination_address = mock.original_destination_address
+    callback_api = mock.callback_address
 
-    allowed_http_method = mock.http_method
-    allowed_content_type = mock.destination_content_type
+    allowed_allowed_http_method = mock.allowed_http_method
+    allowed_content_type = mock.allowed_destination_content_type
 
     url = absolute_uri
-    params = url[url.find(short_id)+len(short_id)+1:]
+    params = url[url.find(hashed_id)+len(hashed_id)+1:]
 
     # check if http method is allowed
-    if requested_http_method == allowed_http_method:
+    if requested_allowed_http_method == allowed_allowed_http_method:
         # check if content_type is allowed
         if requested_content_type == str(allowed_content_type):
-            url = ''.join([destination_address, params])
+            url = ''.join([original_destination_address, params])
 
             if requested_content_type == 'application/json' or forced_format == "json":
                 destination_header = {'Content-type': str(requested_content_type)}
-                if requested_http_method == "GET":
+                if requested_allowed_http_method == "GET":
                     r = requests.get(url, headers=destination_header)
-                elif requested_http_method == "POST":
+                elif requested_allowed_http_method == "POST":
                     r = requests.post(url, headers=destination_header)
-                elif requested_http_method == "PATCH":
+                elif requested_allowed_http_method == "PATCH":
                     r = requests.patch(url, headers=destination_header)            
-                elif requested_http_method == "PUT":
+                elif requested_allowed_http_method == "PUT":
                     r = requests.put(url, headers=destination_header)  
                 else:
                     return JsonResponse({"status": "Something went wrong"}, status=500)
                     
                 if r.status_code == requests.codes.ok:
                     if callback_api:
-                        response = make_callback(short_id, data=r)
+                        response = make_callback(hashed_id, data=r)
                         #TODO: add handler for status codes
                         print("callback status_code", response)
                     logging.info("Destination API: %s, response: %s" % (url, r.text))
