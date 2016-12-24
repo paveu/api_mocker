@@ -48,7 +48,7 @@ def mocked_api_view(request, hashed_id):
     """
 
     return process_request(hashed_id=hashed_id,
-                           requested_allowed_http_method=request.method,
+                           requested_http_method=request.method,
                            requested_content_type=request.content_type,
                            absolute_uri=request.build_absolute_uri(),
                            forced_format= request.GET.get('format', '')

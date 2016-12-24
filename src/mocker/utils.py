@@ -46,7 +46,7 @@ def make_callback(hashed_id, data):
 
 
 def process_request(hashed_id,
-                    requested_allowed_http_method,
+                    requested_http_method,
                     requested_content_type,
                     absolute_uri,
                     forced_format):
@@ -58,27 +58,27 @@ def process_request(hashed_id,
     original_destination_address = mock.original_destination_address
     callback_api = mock.callback_address
 
-    allowed_allowed_http_method = mock.allowed_http_method
-    allowed_content_type = mock.allowed_destination_content_type
+    allowed_mocked_allowed_http_method = mock.mocked_allowed_http_method
+    allowed_content_type = mock.mocked_allowed_content_type
 
     url = absolute_uri
     params = url[url.find(hashed_id)+len(hashed_id)+1:]
 
     # check if http method is allowed
-    if requested_allowed_http_method == allowed_allowed_http_method:
+    if requested_http_method == allowed_mocked_allowed_http_method:
         # check if content_type is allowed
         if requested_content_type == str(allowed_content_type):
             url = ''.join([original_destination_address, params])
 
             if requested_content_type == 'application/json' or forced_format == "json":
                 destination_header = {'Content-type': str(requested_content_type)}
-                if requested_allowed_http_method == "GET":
+                if requested_http_method == "GET":
                     r = requests.get(url, headers=destination_header)
-                elif requested_allowed_http_method == "POST":
+                elif requested_http_method == "POST":
                     r = requests.post(url, headers=destination_header)
-                elif requested_allowed_http_method == "PATCH":
+                elif requested_http_method == "PATCH":
                     r = requests.patch(url, headers=destination_header)            
-                elif requested_allowed_http_method == "PUT":
+                elif requested_http_method == "PUT":
                     r = requests.put(url, headers=destination_header)  
                 else:
                     return JsonResponse({"status": "Something went wrong"}, status=500)

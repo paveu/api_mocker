@@ -14,7 +14,7 @@ class DefaultModel(models.Model):
         abstract = True
 
 class Mocker(DefaultModel):
-    allowed_http_method_CHOICES = (
+    mocked_allowed_http_method_CHOICES = (
         ('POST', 'POST'),
         ('GET', 'GET'),
         ('PATCH', 'PATCH'),
@@ -35,15 +35,7 @@ class Mocker(DefaultModel):
     
     original_destination_address = models.URLField(
         max_length=200,
-        verbose_name='Destination API address to be mocked')
-    allowed_http_method = models.CharField(
-        verbose_name='Allowed HTTP method for a mocked API',
-        max_length=256,
-        choices=allowed_http_method_CHOICES)
-    allowed_destination_content_type = models.CharField(
-        verbose_name='Allowed content type for a mocked API',
-        max_length=256,
-        choices=CONTENT_TYPE_CHOICES)
+        verbose_name='Original API address')
     callback_address = models.URLField(
         max_length=200,
         verbose_name='Callback API address',
@@ -55,15 +47,23 @@ class Mocker(DefaultModel):
         choices=CONTENT_TYPE_CHOICES,
         blank=True,
         null=True)
-    hashed_id = models.CharField(
-        verbose_name='Hashed ID',
-        max_length=128)
     mocked_address = models.URLField(
         max_length=200,
         verbose_name='Mocked API Address',
         blank=True,
         null=True)
-        
+    mocked_allowed_http_method = models.CharField(
+        verbose_name='Mocked API allowed HTTP method',
+        max_length=256,
+        choices=mocked_allowed_http_method_CHOICES)
+    mocked_allowed_content_type = models.CharField(
+        verbose_name='Mocked API allowed content type',
+        max_length=256,
+        choices=CONTENT_TYPE_CHOICES)
+    hashed_id = models.CharField(
+        verbose_name='Hashed ID',
+        max_length=128)
+
     class Meta:
         verbose_name = 'Mocked API'
         verbose_name_plural = 'Mocked APIs'
