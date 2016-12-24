@@ -2,14 +2,27 @@ import requests
 import json
 import logging
 from django.conf import settings
-from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render
 
 from .models import Mocker
 
 logging.basicConfig(filename=settings.LOGFILE_INFO, level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def get_hashed_id():
+    """
+    This will generate unique hashed ID for mocking API
+    """
+    length = settings.SHORT_URL_MAX_LEN
+    char = string.ascii_uppercase + string.digits + string.ascii_lowercase
+    while True:
+        short_id = ''.join(random.choice(char) for x in range(length))
+        try:
+            temp = Mocker.objects.get(short_id=short_id)
+        except:
+            return short_id
+
 
 def make_callback(short_id, data):
     """
