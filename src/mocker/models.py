@@ -47,11 +47,6 @@ class Mocker(DefaultModel):
         choices=CONTENT_TYPE_CHOICES,
         blank=True,
         null=True)
-    mocked_address = models.URLField(
-        max_length=200,
-        verbose_name='Mocked API Address',
-        blank=True,
-        null=True)
     mocked_allowed_http_method = models.CharField(
         verbose_name='Mocked API allowed HTTP method',
         max_length=256,
@@ -60,6 +55,11 @@ class Mocker(DefaultModel):
         verbose_name='Mocked API allowed content type',
         max_length=256,
         choices=CONTENT_TYPE_CHOICES)
+    mocked_address = models.URLField(
+        max_length=200,
+        verbose_name='Mocked API Address',
+        blank=True,
+        null=True)
     hashed_id = models.CharField(
         verbose_name='Hashed ID',
         max_length=128)
