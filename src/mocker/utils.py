@@ -29,12 +29,7 @@ def get_hashed_id():
 
 def make_http_request(url, requested_http_method, requested_content_type, data=None):
     """
-    TBD
-    :param url:
-    :param requested_http_method:
-    :param requested_content_type:
-    :param data:
-    :return:
+    To be explained...
     """
     resp = None
 
@@ -47,11 +42,8 @@ def make_http_request(url, requested_http_method, requested_content_type, data=N
     if requested_content_type == 'application/json':
         if data:
             data = json.dumps(data)
-    # elif requested_content_type == 'application/json':
-    #     if data:
-    #         pass
-    destination_header = {'Content-type': requested_content_type}
 
+    destination_header = {'Content-type': requested_content_type}
     if requested_http_method == "GET":
         resp = requests.get(url, data=data, headers=destination_header)
     elif requested_http_method == "POST":
@@ -65,7 +57,7 @@ def make_http_request(url, requested_http_method, requested_content_type, data=N
 
 def make_callback(hashed_id, resp):
     """
-    Make callback API
+    Make callback to predefined address
     """
 
     mock = Mocker.objects.get(hashed_id=hashed_id)
@@ -78,11 +70,7 @@ def make_callback(hashed_id, resp):
                       data=resp)
 
 
-def process_request(hashed_id,
-                    requested_http_method,
-                    requested_content_type,
-                    absolute_uri,
-                    forced_format):
+def process_request(hashed_id, requested_http_method, requested_content_type, absolute_uri, forced_format):
     """
     Performing HTTP operations on mocked API
     """
@@ -107,19 +95,15 @@ def process_request(hashed_id,
                     if callback_address:
                         make_callback(hashed_id, resp=resp)
                     return JsonResponse(json.dumps(resp.text), safe=False, status=resp.status_code)
-                return JsonResponse({"status": "HTTP Requests internal error. No Requests object. X-files"}, status=500)
+                return JsonResponse({"status": "HTTP Requests internal error"}, status=500)
 
             elif requested_content_type == 'text/plain':
                 resp = make_http_request(url, requested_http_method, requested_content_type)
                 if resp:
                     if callback_address:
                         make_callback(hashed_id, resp=resp)
-                        return HttpResponse(content=resp.text,
-                                            content_type='text/plain',
-                                            status=resp.status_code)
-                return HttpResponse(content="HTTP Requests internal error. No Requests object. X-files",
-                                    content_type='text/plain',
-                                    status=500)
+                    return HttpResponse(content=resp.text, content_type='text/plain', status=resp.status_code)
+                return HttpResponse(content="HTTP Requests internal error", content_type='text/plain', status=500)
 
         else:
             return JsonResponse({"status": "Requested Content type is not allowed"}, status=405)
