@@ -34,14 +34,16 @@ def make_http_request(url, requested_http_method, requested_content_type, data=N
     :return:
     """
     resp = None
-    # elif resp.status_code != 200:
-    #     return JsonResponse({"status": "%s" % resp.reason}, status=resp.status_code)
-    # and resp.status_code == requests.codes.ok
+
+    if data:
+        if data.status_code != 200:
+            data = data.reason
+        else:
+            data = data.text
+
     if requested_content_type == 'application/json':
         if data:
-            data = json.dumps(data.text)
-    else:
-        data = data.text
+            data = json.dumps(data)
 
     destination_header = {'Content-type': requested_content_type}
 
@@ -64,11 +66,10 @@ def make_callback(hashed_id, resp):
     mock = Mocker.objects.get(hashed_id=hashed_id)
     callback_address = mock.callback_address
     callback_content_type = mock.callback_content_type
-    callback_resp = make_http_request(url=callback_address,
-                                      requested_http_method="POST",
-                                      requested_content_type=callback_content_type,
-                                      data=resp)
-    return callback_resp.status_code
+    make_http_request(url=callback_address,
+                      requested_http_method="POST",
+                      requested_content_type=callback_content_type,
+                      data=resp)
 
 
 def process_request(hashed_id,
@@ -93,20 +94,16 @@ def process_request(hashed_id,
     if requested_http_method == mocked_allowed_http_method:
         # Check if requested content_type is allowed
         if requested_content_type == mocked_allowed_content_type:
-            resp = None
 
             if requested_content_type == 'application/json' or forced_format == "json":
                 resp = make_http_request(url, requested_http_method, requested_content_type)
-
-            if not resp:
-                return JsonResponse({"status": "HTTP Requests internal error. No Requests object"}, status=500)
-            elif resp:
-                if callback_address:
-                    make_callback(hashed_id, resp=resp)
-
-            return JsonResponse(json.dumps(resp.text), safe=False, status=resp.status_code)
-
-
+                if resp:
+                    if callback_address:
+                        make_callback(hashed_id, resp=resp)
+                    return JsonResponse(json.dumps(resp.text), safe=False, status=resp.status_code)
+                return JsonResponse({"status": "HTTP Requests internal error. No Requests object. X-files"}, status=500)
+            elif requested_content_type == 'text/xml':
+                pass
         else:
             return JsonResponse({"status": "Requested Content type is not allowed"}, status=405)
     else:
