@@ -1,10 +1,13 @@
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 import json
 import logging
 import requests
 import random
 import string
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .models import Mocker
 
 logger = logging.getLogger(__name__)
@@ -44,7 +47,9 @@ def make_http_request(url, requested_http_method, requested_content_type, data=N
     if requested_content_type == 'application/json':
         if data:
             data = json.dumps(data)
-
+    # elif requested_content_type == 'application/json':
+    #     if data:
+    #         pass
     destination_header = {'Content-type': requested_content_type}
 
     if requested_http_method == "GET":
@@ -66,6 +71,7 @@ def make_callback(hashed_id, resp):
     mock = Mocker.objects.get(hashed_id=hashed_id)
     callback_address = mock.callback_address
     callback_content_type = mock.callback_content_type
+
     make_http_request(url=callback_address,
                       requested_http_method="POST",
                       requested_content_type=callback_content_type,
@@ -102,8 +108,19 @@ def process_request(hashed_id,
                         make_callback(hashed_id, resp=resp)
                     return JsonResponse(json.dumps(resp.text), safe=False, status=resp.status_code)
                 return JsonResponse({"status": "HTTP Requests internal error. No Requests object. X-files"}, status=500)
-            elif requested_content_type == 'text/xml':
-                pass
+
+            elif requested_content_type == 'text/plain':
+                resp = make_http_request(url, requested_http_method, requested_content_type)
+                if resp:
+                    if callback_address:
+                        make_callback(hashed_id, resp=resp)
+                        return HttpResponse(content=resp.text,
+                                            content_type='text/plain',
+                                            status=resp.status_code)
+                return HttpResponse(content="HTTP Requests internal error. No Requests object. X-files",
+                                    content_type='text/plain',
+                                    status=500)
+
         else:
             return JsonResponse({"status": "Requested Content type is not allowed"}, status=405)
     else:

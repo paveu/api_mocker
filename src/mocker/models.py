@@ -29,7 +29,7 @@ class Mocker(DefaultModel):
         # ('text/csv', 'text/csv'),
         # ('text/html', 'text/html'),
         # ('text/json', 'text/json'),
-        # ('text/plain', 'text/plain'),
+        ('text/plain', 'text/plain'),
         # ('text/xml', 'text/xml'),
     )
     
