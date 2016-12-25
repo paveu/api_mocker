@@ -24,39 +24,42 @@ def get_hashed_id():
             return hashed_id
 
 
+def make_http_request(url, requested_http_method, requested_content_type, data=None):
+    resp = None
+
+    if requested_content_type == 'application/json':
+        if data:
+            data = json.dumps(data.text)
+    else:
+        data = data.text
+
+    destination_header = {'Content-type': requested_content_type}
+
+    if requested_http_method == "GET":
+        resp = requests.get(url, data=data, headers=destination_header)
+    elif requested_http_method == "POST":
+        resp = requests.post(url, data=data, headers=destination_header)
+    elif requested_http_method == "PATCH":
+        resp = requests.patch(url, data=data, headers=destination_header)
+    elif requested_http_method == "PUT":
+        resp = requests.put(url, data=data, headers=destination_header)
+    return resp
+
+
 def make_callback(hashed_id, data):
     """
     Make callback API
     """
 
     mock = Mocker.objects.get(hashed_id=hashed_id)
-    callback_api = mock.callback_address
+    callback_address = mock.callback_address
     callback_content_type = mock.callback_content_type
-
-    try:
-        data = json.dumps(data.json())
-    except ValueError:
-        data = {'status': 'No JSON object could be decoded'}
-
-    callback_header = {'Content-type': str(callback_content_type)}
-    callback = requests.post(callback_api, data=data, headers=callback_header)
-    return callback.status_code
-
-
-def perform_http_request(url, requested_http_method, requested_content_type):
-
-    destination_header = {'Content-type': requested_content_type}
-
-    resp = None
-    if requested_http_method == "GET":
-        resp = requests.get(url, headers=destination_header)
-    elif requested_http_method == "POST":
-        resp = requests.post(url, headers=destination_header)
-    elif requested_http_method == "PATCH":
-        resp = requests.patch(url, headers=destination_header)
-    elif requested_http_method == "PUT":
-        resp = requests.put(url, headers=destination_header)
-    return resp
+    print("make_callback data", data)
+    callback_resp = make_http_request(url=callback_address,
+                                      requested_http_method="POST",
+                                      requested_content_type=callback_content_type,
+                                      data=data)
+    return callback_resp.status_code
 
 
 def process_request(hashed_id,
@@ -83,16 +86,19 @@ def process_request(hashed_id,
     if requested_http_method == mocked_allowed_http_method:
         # check if requested content_type is allowed
         if requested_content_type == mocked_allowed_content_type:
+            resp = None
 
             if requested_content_type == 'application/json' or forced_format == "json":
-                resp = perform_http_request(url, requested_http_method, requested_content_type)
+                resp = make_http_request(url, requested_http_method, requested_content_type)
                 if not resp:
                     return JsonResponse({"status": "Not recognized HTTP method or error while processing request"}, status=500)
 
-                if resp.status_code == requests.codes.ok:
-                    if callback_api:
-                        make_callback(hashed_id, data=resp)
+            if resp is not None and resp.status_code == requests.codes.ok:
+                if callback_api:
+                    make_callback(hashed_id, data=resp)
+
                 return JsonResponse(json.dumps(resp.text), safe=False, status=resp.status_code)
+
         else:
             return JsonResponse({"status": "Requested Content type is not allowed"}, status=405)
     else:
