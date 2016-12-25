@@ -34,7 +34,9 @@ def make_http_request(url, requested_http_method, requested_content_type, data=N
     :return:
     """
     resp = None
-
+    # elif resp.status_code != 200:
+    #     return JsonResponse({"status": "%s" % resp.reason}, status=resp.status_code)
+    # and resp.status_code == requests.codes.ok
     if requested_content_type == 'application/json':
         if data:
             data = json.dumps(data.text)
@@ -54,7 +56,7 @@ def make_http_request(url, requested_http_method, requested_content_type, data=N
     return resp
 
 
-def make_callback(hashed_id, data):
+def make_callback(hashed_id, resp):
     """
     Make callback API
     """
@@ -65,7 +67,7 @@ def make_callback(hashed_id, data):
     callback_resp = make_http_request(url=callback_address,
                                       requested_http_method="POST",
                                       requested_content_type=callback_content_type,
-                                      data=data)
+                                      data=resp)
     return callback_resp.status_code
 
 
@@ -95,17 +97,16 @@ def process_request(hashed_id,
 
             if requested_content_type == 'application/json' or forced_format == "json":
                 resp = make_http_request(url, requested_http_method, requested_content_type)
-                return JsonResponse(json.dumps(resp.text), safe=False, status=resp.status_code)
 
             if not resp:
                 return JsonResponse({"status": "HTTP Requests internal error. No Requests object"}, status=500)
-            elif resp.status_code != 200:
-                return JsonResponse({"status": "%s" % resp.reason}, status=resp.status_code)
-            elif resp and resp.status_code == requests.codes.ok:
+            elif resp:
                 if callback_address:
-                    make_callback(hashed_id, data=resp)
-            else:
-                return JsonResponse({"status": "HTTP request failed, somethings went down. X-Files"}, status=500)
+                    make_callback(hashed_id, resp=resp)
+
+            return JsonResponse(json.dumps(resp.text), safe=False, status=resp.status_code)
+
+
         else:
             return JsonResponse({"status": "Requested Content type is not allowed"}, status=405)
     else:
