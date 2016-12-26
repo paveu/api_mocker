@@ -21,6 +21,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', home, name='home'),
     url(r'job-submit/$', job_post_view, name='job_submit_view'),
-    url(r'^(?P<hashed_id>\w{6})/(.*)$', mocked_api_view, name='mocked_api_view'),
+    url(r'^(?P<hashed_id>\w{6})(.*)$', mocked_api_view, name='mocked_api_view'),
 
 ]

@@ -1,13 +1,19 @@
+import mock
+# import requests_mock
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-# from mocker.factories import MockFactory
 from mocker.models import Mocker
 from mocker.utils import get_hashed_id
+
+# This method will be used by the mock to replace requests.get
+def mocked_requests_get(*args, **kwargs):
+    pass
 
 
 class TestBasic(TestCase):
     def setUp(self):
         self.client = Client()
+        self.hashed_id = get_hashed_id()
         # self.mock_obj = MockFactory()
         self.mock_obj = Mocker.objects.create(
             creation_date=None,
@@ -18,7 +24,7 @@ class TestBasic(TestCase):
             mocked_allowed_http_method = "POST",
             mocked_allowed_content_type = "application/json",
             mocked_address = "http://localhost:8000/RGNhou/",
-            hashed_id = get_hashed_id(),
+            hashed_id = self.hashed_id,
         )
 
     def test_home_view(self):
@@ -40,23 +46,10 @@ class TestBasic(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['action_msg'], "Thanks for mocking an API !")
 
-
-    def test_job_post_view(self):
-        hashed_id = self.mock_obj.hashed_id
-        hashed_id = ''.join([hashed_id, '/'])
-        mocked_api_url = reverse('mocked_api_view', kwargs={'hashed_id': hashed_id})
-        print("mocked_api_url", mocked_api_url)
-
+    # @mock.patch('requests.post', mock.Mock(side_effect=mocked_requests_get))
+    @mock.patch('requests.post', mock.Mock(reason="dupa"))
+    def test_job_post_view(self, mock_resp):
+        mocked_api_url = reverse(viewname='mocked_api_view', args=[self.hashed_id, ''])
         response = self.client.post(path=mocked_api_url, data={}, content_type="application/json")
         print(response)
-        # print("response.context", response.context)
-        # # print("mocked_api_url", mocked_api_url)
-        # #
-        # # process_request(hashed_id=hashed_id,
-        # #                 requested_http_method=request.method,
-        # #                 requested_content_type=request.content_type,
-        # #                 absolute_uri=request.build_absolute_uri(),
-        # #                 forced_format=request.GET.get('format', '')
-        # #                 )
-        # #
-        # # pass
+        print(mock_resp)
