@@ -1,6 +1,4 @@
 import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 import json
 import logging
 import requests
@@ -9,7 +7,8 @@ import string
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from .models import Mocker
-
+reload(sys)
+sys.setdefaultencoding('utf8')
 logger = logging.getLogger(__name__)
 
 

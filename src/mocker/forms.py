@@ -9,11 +9,11 @@ class MockerForm(forms.ModelForm):
     class Meta:
         model = Mocker
         fields = ['original_destination_address',
-            'mocked_allowed_http_method',
-            'mocked_allowed_content_type',
-            'callback_address',
-            'callback_content_type',
-            ]
+                  'mocked_allowed_http_method',
+                  'mocked_allowed_content_type',
+                  'callback_address',
+                  'callback_content_type'
+                  ]
 
     def __init__(self, *args, **kwargs):
         super(MockerForm, self).__init__(*args, **kwargs)
