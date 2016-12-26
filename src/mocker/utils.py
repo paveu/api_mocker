@@ -4,6 +4,7 @@ import logging
 import requests
 import random
 import string
+import urlparse
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from .models import Mocker
@@ -73,15 +74,25 @@ def process_request(hashed_id, requested_http_method, requested_content_type, ab
     """
     Performing HTTP operations on mocked API
     """
-
+    print("hashed_id", hashed_id)
     mock = Mocker.objects.get(hashed_id=hashed_id)
+    print("mock", mock)
     original_destination_address = mock.original_destination_address
+    print("original_destination_address", original_destination_address)
     callback_address = mock.callback_address
+    print("callback_address", callback_address)
     mocked_allowed_http_method = mock.mocked_allowed_http_method
+    print("mocked_allowed_http_method", mocked_allowed_http_method)
     mocked_allowed_content_type = mock.mocked_allowed_content_type
+    print("mocked_allowed_content_type", mocked_allowed_content_type)
 
+    print("absolute_uri", absolute_uri)
     params = absolute_uri[absolute_uri.find(hashed_id)+len(hashed_id)+1:]
-    url = ''.join([original_destination_address, params])
+    print("params", params)
+    print("original_destination_address",original_destination_address)
+    url = urlparse.urljoin(original_destination_address, params)
+    # url = ''.join([str(original_destination_address), str(params)])
+    # print("url", url)
 
     # Check if requested http method is allowed
     if requested_http_method == mocked_allowed_http_method:
