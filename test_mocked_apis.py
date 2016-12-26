@@ -3,7 +3,7 @@ import requests
 
 # GET (original api: http://jsonplaceholder.typicode.com/ => http://mock-pawelste.c9users.io/r1RqbY/ (MOCKED))
 headers = {'Content-type': 'application/json'}
-res = requests.get("http://localhost:8000/RGNhou/", headers=headers)
+res = requests.get("http://localhost:8000/TsjR2n/", headers=headers)
 print(res.json())
 print(res.status_code)
 

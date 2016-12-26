@@ -13,6 +13,7 @@ class DefaultModel(models.Model):
     class Meta:
         abstract = True
 
+
 class Mocker(DefaultModel):
     mocked_allowed_http_method_CHOICES = (
         ('POST', 'POST'),
