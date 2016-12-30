@@ -63,7 +63,8 @@ def make_callback(hashed_id, resp):
     mock = Mocker.objects.get(hashed_id=hashed_id)
     callback_address = mock.callback_address
     callback_content_type = mock.callback_content_type
-
+    print("response callback", resp)
+    print("response callback.text", resp.text)
     make_http_request(url=callback_address,
                       requested_http_method="POST",
                       requested_content_type=callback_content_type,
@@ -97,10 +98,10 @@ def process_request(hashed_id, requested_http_method, requested_content_type, ab
 
             if requested_content_type == 'application/json' or forced_format == "json":
                 resp = make_http_request(url, requested_http_method, requested_content_type)
-                print("url2", url)
-                print("requested_http_method", requested_http_method)
-                print("requested_content_type", requested_content_type)
-                print("resp", resp)
+                print("process_request url:", url)
+                print("process_request requested_http_method", requested_http_method)
+                print("process_request requested_content_type", requested_content_type)
+                print("process_request response", resp)
                 if resp:
                     if callback_address:
                         make_callback(hashed_id, resp=resp)
