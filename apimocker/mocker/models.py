@@ -2,13 +2,9 @@
 
 from __future__ import unicode_literals
 
-import logging
 from django.db import models
 
 from .enums import HTTP_METHODS, CONTENT_TYPES, STATUS_CODES
-
-logger = logging.getLogger(__name__)
-# sentry_logger = logging.getLogger('sentry')
 
 
 class DefaultModel(models.Model):

@@ -1,24 +1,11 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
-from celery import Celery
-from celery.schedules import crontab
+import os
+import celery
 from django.conf import settings
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'apimocker.settings')
 
-app = Celery(
-    'mocker',
-    broker=settings.REDIS_MOCKER_URL,
-)
-
-app.conf.update(
-    beat_schedule={
-        'warehouse-synchro': {
-            'task': 'mocker.tasks.cron_synchro',
-            'schedule': crontab(hour='*', minute='*')
-        },
-    },
-    worker_hijack_root_logger=False,
-)
-
-
+app = celery.Celery()
+app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

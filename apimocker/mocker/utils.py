@@ -36,8 +36,10 @@ class Requester(object):
         self.forced_format = forced_format
 
     def make_callback(self, mock, response):
-        # TODO: make it async
-        make_http_request(
+        logger.info("mocker:make-callback", extra={
+            'mocker_id': mock.id
+        })
+        make_http_request.delay(
             url=mock.callback_address,
             requested_http_method=HTTP_METHODS.POST,
             requested_content_type=mock.callback_content_type,
@@ -45,6 +47,9 @@ class Requester(object):
         )
 
     def make_response(self, mock, response):
+        logger.info("mocker:make-response", extra={
+            'mocker_id': mock.id
+        })
         if response:
             if mock.callback_address:
                 self.make_callback(mock, response=response)
@@ -69,6 +74,9 @@ class Requester(object):
     def process_request(self):
         try:
             mock = Mocker.objects.get(hashed_id=self.hashed_id)
+            logger.info("mocker:process-request-get-mock", extra={
+                'mocker_id': mock.id
+            })
         except Mocker.DoesNotExist:
             return redirect("/")
 

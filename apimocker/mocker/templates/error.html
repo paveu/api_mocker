@@ -4,7 +4,7 @@
 {% block content %}
 	{% for message in messages %}
 	<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-	{% endfor %}   
+	{% endfor %}
 
     <a href="{% url 'home' %}">Go to the Home page</a>
 
