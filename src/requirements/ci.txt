@@ -1,0 +1,9 @@
+-r dev.txt
+
+factory-boy==2.8.1
+Faker==0.7.7
+mock==2.0.0
+flake8
+django-nose
+nose>=1.2.1
+coverage==4.3.1
