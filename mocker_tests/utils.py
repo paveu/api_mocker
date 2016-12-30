@@ -9,7 +9,7 @@ def mocked_requests_post(*args, **kwargs):
         def json(self):
             return self.json_data
 
-    print("mocked_requests_post args:", args)
+    # print("mocked_requests_post args:", args)
     if args[0]:
         return MockResponse(json_data={"key": "value"}, status_code=200, text="good_text", reason="no reason")
     else:

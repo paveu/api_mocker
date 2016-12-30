@@ -11,7 +11,6 @@ class TestBasic(TestCase):
     def setUp(self):
         self.client = Client()
         self.hashed_id = get_hashed_id()
-        # self.mock_obj = MockFactory()
         self.mock_obj = Mocker.objects.create(
             creation_date=None,
             updation_date=None,
@@ -31,12 +30,12 @@ class TestBasic(TestCase):
 
     def test_job_post_view(self):
         job_submit_url = reverse("job_submit_view")
-        response = self.client.post(path=job_submit_url, data={'original_destination_address': 'http://jsonplaceholder.typicode.com',
-                                                               'mocked_allowed_http_method': 'POST',
-                                                               'mocked_allowed_content_type': 'application/json',
-                                                               'callback_address': 'https://flask-app-pawelste.c9users.io/callback/',
-                                                               'callback_content_type': 'application/json'
-                                                               }
+        response = self.client.post(path=job_submit_url,
+                                    data={'original_destination_address': 'http://jsonplaceholder.typicode.com',
+                                          'mocked_allowed_http_method': 'POST',
+                                          'mocked_allowed_content_type': 'application/json',
+                                          'callback_address': 'https://flask-app-pawelste.c9users.io/callback/',
+                                          'callback_content_type': 'application/json'}
                                     )
 
         self.assertTemplateUsed(response, 'action_status.html')
