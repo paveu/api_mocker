@@ -6,9 +6,6 @@ LOGGING = {
         'handlers': ['main', 'sentry'],
     },
     'formatters': {
-        # 'logstash': {
-        #     '()': 'apimocker.utils.log.LogstashFormatter',
-        # },
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
         },
@@ -17,7 +14,7 @@ LOGGING = {
         'main': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
+            'formatter': 'verbose',
         },
         'sentry': {
             'level': 'ERROR',
@@ -26,19 +23,29 @@ LOGGING = {
     },
     'loggers': {
         'django.db.backends': {
-            'handlers': ['main'],
+            'handlers': ['sentry'],
             'level': 'ERROR',
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['main'],
+            'handlers': ['sentry'],
             'level': 'ERROR',
             'propagate': False,
         },
         'raven': {
-            'handlers': ['main'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
+            'handlers': ['sentry'],
             'propagate': False,
         },
-    }
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['sentry'],
+            'propagate': False,
+        },
+        'celery': {
+            'level': 'WARNING',
+            'handlers': ['sentry'],
+            'propagate': False,
+        },
+    },
 }
