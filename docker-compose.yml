@@ -1,0 +1,31 @@
+version: "2"
+services:
+  web:
+    build: .
+    environment:
+      - ENVIRONMENT
+      - DATABASE_MOCKER_URL
+      - RAVEN_CONFIG_DSN
+      - REDIS_MOCKER_URL
+    command: /base/entry web
+    ports:
+      - "8000:8443"
+    volumes:
+     - .:/app
+    links:
+      - cache
+  celery:
+    build: .
+    environment:
+      - ENVIRONMENT
+      - DATABASE_MOCKER_URL
+      - RAVEN_CONFIG_DSN
+      - REDIS_MOCKER_URL
+    command: /base/entry celery_worker_and_beat
+    links:
+      - cache
+  cache:
+    restart: always
+    image: redis:latest
+    ports:
+      - 6379
