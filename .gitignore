@@ -88,3 +88,11 @@ ENV/
 
 # Rope project settings
 .ropeproject
+certs
+old_files
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/mocker.iml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/emacs.xml

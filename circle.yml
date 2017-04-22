@@ -1,17 +1,13 @@
 machine:
-#    pre:
-#        - export PATH=/home/ubuntu/api_mocker
     services:
         - postgresql
+        - redis
     python:
         version: 2.7.10
-#    environment:
-#        PYTHONPATH: /home/ubuntu/api_mocker
-database:
-  pre:
-    - python src/manage.py makemigrations --settings=apimocker.local_test
-    - python src/manage.py migrate --settings=apimocker.local_test
-
+    environment:
+        ENVIRONMENT: ci
+        PYTHONPATH: .:mocker
+        TEST_COVERAGE_CIRCLE_CI: True
 dependencies:
     pre:
         - sudo apt-get update
@@ -21,11 +17,9 @@ dependencies:
         - pip install -U setuptools
         # install dev dependencies which contain test packages
         # for django-parler we need to clear DJANGO_SETTINGS_MODULE
-        - DJANGO_SETTINGS_MODULE= pip install -U -r src/requirements/ci.txt --exists-action=w
+        - DJANGO_SETTINGS_MODULE= pip install -U -r requirements/ci.txt --exists-action=w
 
 test:
     override:
-        - flake8 src/mocker --ignore E501
-        - python src/manage.py test --settings=apimocker.local_test --noinput --with-coverage --cover-package=mocker --cover-html --cover-erase --nologcapture --cover-html-dir=coverage_link --verbosity=0:
-            timeout: 1200 # 20 minutes
-#        - python src/manage.py test --settings=apimocker.local_test
+        - flake8 mocker
+        - python manage.py test
