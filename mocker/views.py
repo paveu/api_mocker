@@ -2,15 +2,34 @@ from django.contrib import messages
 from django.conf import settings
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.edit import CreateView
+
 from .forms import MockerForm
 from .utils import process_request, get_hashed_id
+from .models import Mocker
 
 
-def home(request):
-    """
-    It prints out Mock API form
-    """
-    return render(request, "home.html", {'form': MockerForm()})
+class CreateMockerView(CreateView):
+    template_name = "create_mocker.html"
+    form_class = MockerForm
+    model = Mocker
+#
+# class MyFormView(View):
+#     form_class = MyForm
+#     initial = {'key': 'value'}
+#     template_name = 'form_template.html'
+#
+#     def get(self, request, *args, **kwargs):
+#         form = self.form_class(initial=self.initial)
+#         return render(request, self.template_name, {'form': form})
+#
+#     def post(self, request, *args, **kwargs):
+#         form = self.form_class(request.POST)
+#         if form.is_valid():
+#             # <process form cleaned data>
+#             return HttpResponseRedirect('/success/')
+#
+#         return render(request, self.template_name, {'form': form})
 
 
 def job_post_view(request):
@@ -29,9 +48,11 @@ def job_post_view(request):
         form_mock.mocked_address = mocked_url
         form_mock.save()
 
-        context = {"destination_url": form_mock.original_destination_address,
-                   "mocked_url": mocked_url,
-                   "action_msg": "Thanks for mocking an API !"}
+        context = {
+            "destination_url": form_mock.original_destination_address,
+            "mocked_url": mocked_url,
+            "action_msg": "Thanks for mocking an API !"
+        }
 
         messages.success(request, "Operation completed with success")
         return render(request, "action_status.html", context)
@@ -47,9 +68,18 @@ def mocked_api_view(request, hashed_id):
     mocked API address
     """
 
-    return process_request(hashed_id=hashed_id,
-                           requested_http_method=request.method,
-                           requested_content_type=request.content_type,
-                           absolute_uri=request.build_absolute_uri(),
-                           forced_format=request.GET.get('format', '')
-                           )
+    return process_request(
+        hashed_id=hashed_id,
+        requested_http_method=request.method,
+        requested_content_type=request.content_type,
+        absolute_uri=request.build_absolute_uri(),
+        forced_format=request.GET.get('format', ''),
+    )
+
+# class PublisherBookList(ListView):
+#
+#     template_name = 'books/books_by_publisher.html'
+#
+#     def get_queryset(self):
+#         self.publisher = get_object_or_404(Publisher, name=self.args[0])
+#         return Book.objects.filter(publisher=self.publisher)
