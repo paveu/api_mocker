@@ -15,12 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from mocker.views import home, job_post_view, mocked_api_view
+
+from mocker.views import job_post_view, mocked_api_view, CreateMockerView
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^$', home, name='home'),
+    url(r'^$', CreateMockerView.as_view(), name="home"),
     url(r'job-submit/$', job_post_view, name='job_submit_view'),
     url(r'^(?P<hashed_id>\w{6})(.*)$', mocked_api_view, name='mocked_api_view'),
-
+    url(r'^admin/', admin.site.urls),
 ]
