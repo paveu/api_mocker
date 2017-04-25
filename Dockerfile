@@ -4,7 +4,7 @@ ENV APP_NAME apimocker
 ENV CELERY_APP apimocker
 ENV DJANGO_SETTINGS_MODULE apimocker.settings
 
-ADD requirements.txt /app/requirements.txt
+ADD /requirements/requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
 
 WORKDIR /app

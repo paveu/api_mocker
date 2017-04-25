@@ -14,7 +14,5 @@ def pull_env(from_, type=None):
 
 pull_env('ENVIRONMENT')
 pull_env('DATABASE_MOCKER_URL')
-pull_env('RAVEN_CONFIG_DSN')
-pull_env('HOSTNAME')
 pull_env('REDIS_MOCKER_URL')
-
+pull_env('RAVEN_CONFIG_DSN')
