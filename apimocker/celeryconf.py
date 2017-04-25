@@ -11,7 +11,7 @@ app = Celery(
 )
 
 app.conf.update(
-    beat_schedule = {
+    beat_schedule={
         'warehouse-synchro': {
             'task': 'mocker.tasks.cron_synchro',
             'schedule': crontab(hour='*', minute='*')

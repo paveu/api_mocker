@@ -12,6 +12,7 @@ def import_settings_module(name):
     if loader:
         execfile(loader.filename, globals())
 
+
 IS_TEST = len(sys.argv) > 1 and sys.argv[1] == 'test'
 # used to distinguish web app from celery app, in logging for example
 ENVIRONMENT = os.environ.get('ENVIRONMENT') or ('test' if IS_TEST else 'dev')

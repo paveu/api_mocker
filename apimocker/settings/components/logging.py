@@ -42,11 +42,3 @@ LOGGING = {
         },
     }
 }
-
-# if RACK:
-#     LOGGING['handlers']['main'] = {
-#         'level': 'INFO',
-#         'class': 'logging.FileHandler',
-#         'filename': '/var/log/app.log',
-#         'formatter': 'logstash'
-#     }
