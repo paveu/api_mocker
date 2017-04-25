@@ -1,2 +1,2 @@
-import_settings_module('envs._prod')
+import_settings_module('envs._prod') # noqa
 DEBUG = True

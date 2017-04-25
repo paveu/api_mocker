@@ -6,20 +6,17 @@ machine:
         version: 2.7.10
     environment:
         ENVIRONMENT: ci
-        PYTHONPATH: .:mocker
-        TEST_COVERAGE_CIRCLE_CI: True
+        PYTHONPATH: $PWD
+        DJANGO_SETTINGS_MODULE: apimocker.settings
+
 dependencies:
     pre:
         - sudo apt-get update
-        # upgrade to latest pip version
         - pip install -U pip
-        # replace default package
         - pip install -U setuptools
-        # install dev dependencies which contain test packages
-        # for django-parler we need to clear DJANGO_SETTINGS_MODULE
-        - DJANGO_SETTINGS_MODULE= pip install -U -r requirements/ci.txt --exists-action=w
+        - pip install -U -r requirements/ci.txt --exists-action=w
 
 test:
     override:
-        - flake8 mocker
+        - flake8 .
         - python manage.py test

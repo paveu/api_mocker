@@ -1,3 +1,14 @@
+## TODO
+- add to form httpresponse fields
+- fix remembering its url after clicking at it
+(https://stackoverflow.com/questions/6366589/how-to-change-the-url-using-django-process-request)
+(https://docs.djangoproject.com/en/1.11/ref/request-response/#django.http.HttpResponseRedirect)
+- remove static files from projects
+- move devops folder to external repo
+- make it as a pip package
+- add sentry
+
+
 ## Installation
 
 ```

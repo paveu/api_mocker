@@ -16,11 +16,11 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from mocker.views import job_post_view, mocked_api_view, CreateMockerView
+from apimocker.mocker.views import ResolveMockedAddressView, CreateMockerView, ProcessMockFormView
 
 urlpatterns = [
     url(r'^$', CreateMockerView.as_view(), name="home"),
-    url(r'job-submit/$', job_post_view, name='job_submit_view'),
-    url(r'^(?P<hashed_id>\w{6})(.*)$', mocked_api_view, name='mocked_api_view'),
     url(r'^admin/', admin.site.urls),
+    url(r'process_form/$', ProcessMockFormView.as_view(), name='process_mock_form_view'),
+    url(r'^(?P<hashed_id>\w{6})(.*)$', ResolveMockedAddressView.as_view(), name='mocked_api_view'),
 ]
