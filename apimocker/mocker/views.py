@@ -26,7 +26,6 @@ class ProcessMockFormView(FormView):
     template_name = "action_status.html"
 
     def form_valid(self, form):
-        # Get unique hashed for API to be mocked
         hashed_id = get_hashed_id()
         mocked_url = ''.join([self.request.build_absolute_uri('/'), hashed_id, "/"])
 

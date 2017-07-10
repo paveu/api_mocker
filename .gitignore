@@ -90,9 +90,14 @@ ENV/
 .ropeproject
 devops/certs
 old_files
+.idea
 .idea/inspectionProfiles/
 .idea/misc.xml
 .idea/mocker.iml
 .idea/modules.xml
 .idea/workspace.xml
 .idea/emacs.xml
+.idea/markdown-navigator.xml
+.idea/markdown-navigator/
+devops
+TODO

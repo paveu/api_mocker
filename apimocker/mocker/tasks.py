@@ -1,15 +1,19 @@
+import logging
 from requests import request
-from celery import shared_task
 
+from apimocker import task
 from .enums import HTTP_METHODS
 
-
-@shared_task
-def cron_synchro():
-    print("test synchro beat")
+logger = logging.getLogger(__name__)
 
 
+@task
 def make_http_request(url, requested_http_method, requested_content_type, data=None):
+    logger.info("mocker:make-http-request", extra={
+        'url': url,
+        'requested_http_method': requested_http_method,
+        'requested_content_type': requested_content_type,
+    })
     ret_data = None
     ret_json = None
 

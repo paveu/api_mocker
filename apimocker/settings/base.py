@@ -26,8 +26,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    # third party apps
     'crispy_forms',
-
+    'raven.contrib.django.raven_compat',
+    # main app
     'apimocker.mocker',
 ]
 
