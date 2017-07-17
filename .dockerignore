@@ -1,0 +1,9 @@
+.env
+*local.py
+local.py
+apimocker/**/local.py
+local*
+.git
+*.pyc
+.cache
+frontend
