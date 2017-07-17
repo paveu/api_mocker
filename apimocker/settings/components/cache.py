@@ -1,8 +1,8 @@
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': '%s:6379' % REDIS_MOCKER_URL, # noqa
-        'KEY_PREFIX': 'mv-dashboard-',
+        'LOCATION': REDIS_MOCKER_URL,  # noqa
+        'KEY_PREFIX': 'mv-mocker-cache',
         'OPTIONS': {
             'DB': 1,
             'PARSER_CLASS': 'redis.connection.HiredisParser',

@@ -1,7 +1,6 @@
 -r requirements.txt
 
 factory_boy==2.3.1
-django-nose==1.4.4
 mock==2.0.0
-responses==0.2.2
+responses==0.8.1
 flake8==3.3.0
