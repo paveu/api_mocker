@@ -27,18 +27,6 @@ class ResponseSetting(DefaultModel):
         return ' - '.join([self.content_type, unicode(self.status_code)])
 
 
-class APILog(DefaultModel):
-    address = models.URLField(max_length=200, verbose_name='Called API', null=True)
-    response = models.TextField(verbose_name='API Response', null=True)
-
-    class Meta:
-        verbose_name = 'API Log'
-        verbose_name_plural = 'API Logs'
-
-    def __unicode__(self):
-        return unicode(self.address)
-
-
 class Mocker(DefaultModel):
     destination_address = models.URLField(max_length=200, verbose_name='API to mock')
     allowed_http_method = models.CharField(verbose_name='Allowed HTTP method for mock', max_length=256,
@@ -51,7 +39,6 @@ class Mocker(DefaultModel):
     mocked_address = models.URLField(max_length=200, verbose_name='Mocked API', blank=True, null=True)
     hashed_id = models.CharField(verbose_name='Hashed ID', max_length=128)
     response_data = models.ForeignKey(ResponseSetting, null=True)
-    api_log = models.ForeignKey(APILog, null=True)
 
     class Meta:
         verbose_name = 'API Mock'
@@ -59,3 +46,16 @@ class Mocker(DefaultModel):
 
     def __unicode__(self):
         return unicode(self.mocked_address)
+
+
+class ResponseLog(DefaultModel):
+    headers = models.TextField(verbose_name='Response headers', null=True)
+    content = models.TextField(verbose_name='Response content', null=True)
+    mocker = models.ForeignKey(Mocker, null=True)
+
+    class Meta:
+        verbose_name = 'Response Log'
+        verbose_name_plural = 'Response logs'
+
+    def __unicode__(self):
+        return unicode(self.mocker.destination_address)

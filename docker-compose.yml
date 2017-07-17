@@ -1,31 +1,101 @@
-version: "2"
+version: "3"
+
 services:
   web:
-    build: .
+    image: docker.io/paveu/apimocker:latest
+    depends_on:
+      - cache
+      - celery
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     environment:
-      - ENVIRONMENT
+    # Values present in the environment at runtime will always override those defined inside the .env file.
+    # Similarly, values passed via command-line arguments take precedence as well.
+    # .env file must be created with following env variables
+      - ENVIRONMENT=production
       - DATABASE_MOCKER_URL
       - RAVEN_CONFIG_DSN
-      - REDIS_MOCKER_URL
-    command: /base/entry web
     ports:
       - "8000:8443"
     volumes:
-     - .:/app
-    links:
-      - cache
+      - .:/app
+    command: /base/entry web
+    networks:
+      - webnet
+  cache:
+    image: redis
+    ports:
+      - "6379:6379"
+    # Make sure your shell is configured to talk to default.
+    # Create a ./data directory on the manager:
+    # docker-machine ssh default "mkdir ./data"
+    # The volume you created that lets the container access ./data (on the host)
+    # as /data (inside the Redis container). While containers come and go,
+    # the files stored on ./data on the specified host will persist, enabling continuity.
+    volumes:
+      - /home/docker/data:/data
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == manager]
+    command: redis-server --appendonly yes
+    networks:
+      - webnet
   celery:
-    build: .
+    image: docker.io/paveu/apimocker:latest
+    depends_on:
+      - cache
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
     environment:
-      - ENVIRONMENT
+      - ENVIRONMENT=production
       - DATABASE_MOCKER_URL
       - RAVEN_CONFIG_DSN
-      - REDIS_MOCKER_URL
+    volumes:
+      - .:/app
     command: /base/entry celery_worker_and_beat
-    links:
-      - cache
-  cache:
-    restart: always
-    image: redis:latest
+    networks:
+      - webnet
+  portainer:
+    image: portainer/portainer
     ports:
-      - 6379
+      - "9000:9000"
+    networks:
+      - webnet
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+  webnet:

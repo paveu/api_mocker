@@ -1,5 +1,7 @@
 FROM paveu/base-webapp
 
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash && apt-get install -y nodejs && apt-get install -y build-essential
+
 ENV APP_NAME apimocker
 ENV CELERY_APP apimocker
 ENV DJANGO_SETTINGS_MODULE apimocker.settings
@@ -10,4 +12,5 @@ RUN pip install -r /app/requirements.txt
 WORKDIR /app
 ADD . /app/
 
+RUN cd frontend && npm config set registry http://registry.npmjs.org/ && npm set strict-ssl falsenpm install && npm install && npm rebuild node-sass && ENVIRONMENT=production npm run build
 RUN ENVIRONMENT=production python manage.py collectstatic --no-input --link -v 0

@@ -5,13 +5,13 @@ import logging
 import random
 import string
 import urlparse
+from requests import request
 
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 
 from .enums import CONTENT_TYPES, HTTP_METHODS, SHORT_URL_MAX_LEN
-from .models import Mocker, APILog
-from .tasks import make_http_request
+from .models import Mocker, ResponseLog
 
 logger = logging.getLogger(__name__)
 
@@ -36,10 +36,8 @@ class Requester(object):
         self.forced_format = forced_format
 
     def make_callback(self, mock, response):
-        logger.info("mocker:make-callback", extra={
-            'mocker_id': mock.id
-        })
-        make_http_request.delay(
+        logger.info("mocker:make-callback", extra={'mocker_id': mock.id})
+        self.make_http_request(
             url=mock.callback_address,
             requested_http_method=HTTP_METHODS.POST,
             requested_content_type=mock.callback_content_type,
@@ -47,21 +45,18 @@ class Requester(object):
         )
 
     def make_response(self, mock, response):
-        logger.info("mocker:make-response", extra={
-            'mocker_id': mock.id
-        })
+        logger.info("mocker:make-response", extra={'mocker_id': mock.id})
         if response:
             if mock.callback_address:
                 self.make_callback(mock, response=response)
 
             response_data = mock.response_data
             if response_data:
-                api_log = APILog.objects.create(
-                    address=mock.destination_address,
-                    response=response.content,
+                ResponseLog.objects.create(
+                    headers=response.headers,
+                    content=response.content,
+                    mocker=mock,
                 )
-                mock.api_log = api_log
-                mock.save()
 
                 is_content_type_json = mock.allowed_content_type == CONTENT_TYPES.APP_JSON
                 # TODO: make content=json.dump(response) ?
@@ -87,11 +82,40 @@ class Requester(object):
                 and self.requested_content_type == mock.allowed_content_type:
 
             if self.forced_format == "json":
-                response = make_http_request(url, self.requested_http_method, CONTENT_TYPES.APP_JSON)
+                response = self.make_http_request(url, self.requested_http_method, CONTENT_TYPES.APP_JSON)
                 return self.make_response(mock, response)
             # TODO: for and if could be removed class and foo
             for ct in CONTENT_TYPES.alist:
                 if ct == self.requested_content_type:
-                    response = make_http_request(url, self.requested_http_method, self.requested_content_type)
+                    response = self.make_http_request(url, self.requested_http_method, self.requested_content_type)
                     return self.make_response(mock, response)
         return HttpResponseForbidden()
+
+    def make_http_request(self, url, requested_http_method, requested_content_type, data=None):
+        logger.info("mocker:make-http-request", extra={
+            'url': url,
+            'requested_http_method': requested_http_method,
+            'requested_content_type': requested_content_type,
+        })
+        ret_data = None
+        ret_json = None
+        if data:
+            if data.status_code != 200:
+                ret_data = data.reason
+            else:
+                ret_data = data.text
+                try:
+                    ret_json = data.json
+                except AttributeError:
+                    pass
+
+        kw = {
+            'data': ret_data,
+            'json': ret_json,
+            'params': None,
+            'headers': {'Content-type': requested_content_type},
+            'allow_redirects': False,
+        }
+        if kw in [HTTP_METHODS.POST, HTTP_METHODS.PUT, HTTP_METHODS.DELETE]:
+            kw['allow_redirects'] = True
+        return request(requested_http_method, url, **kw)
