@@ -40,7 +40,6 @@ Want to contribute? Great!. Pull requests are welcome!
  - Add to form http response fields
  - Body Content Workflow with streams ?
  - Fix remembering its url after clicking at it (https://stackoverflow.com/questions/6366589/how-to-change-the-url-using-django-process-request), (https://docs.djangoproject.com/en/1.11/ref/request-response/#django.http.HttpResponseRedirect)
- - Add http server to tests
 
 
 License
