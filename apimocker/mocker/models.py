@@ -48,14 +48,14 @@ class Mocker(DefaultModel):
         return unicode(self.mocked_address)
 
 
-class ResponseContent(DefaultModel):
-    destination_address = models.URLField(max_length=200, verbose_name='Called API', null=True)
-    content = models.TextField(verbose_name='API Response', null=True)
+class ResponseLog(DefaultModel):
+    headers = models.TextField(verbose_name='Response headers', null=True)
+    content = models.TextField(verbose_name='Response content', null=True)
     mocker = models.ForeignKey(Mocker, null=True)
 
     class Meta:
-        verbose_name = 'Response Content'
-        verbose_name_plural = 'Response Contents'
+        verbose_name = 'Response Log'
+        verbose_name_plural = 'Response logs'
 
     def __unicode__(self):
-        return unicode(self.destination_address)
+        return unicode(self.mocker.destination_address)
