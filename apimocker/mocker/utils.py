@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 
 from .enums import CONTENT_TYPES, HTTP_METHODS, SHORT_URL_MAX_LEN
-from .models import Mocker, ResponseContent
+from .models import Mocker, ResponseLog
 from .tasks import make_http_request
 
 logger = logging.getLogger(__name__)
@@ -56,8 +56,8 @@ class Requester(object):
 
             response_data = mock.response_data
             if response_data:
-                ResponseContent.objects.create(
-                    destination_address=mock.destination_address,
+                ResponseLog.objects.create(
+                    headers=response.headers,
                     content=response.content,
                     mocker=mock,
                 )
