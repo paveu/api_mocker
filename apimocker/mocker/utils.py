@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 
 from .enums import CONTENT_TYPES, HTTP_METHODS, SHORT_URL_MAX_LEN
-from .models import Mocker, APILog
+from .models import Mocker, ResponseContent
 from .tasks import make_http_request
 
 logger = logging.getLogger(__name__)
@@ -56,12 +56,11 @@ class Requester(object):
 
             response_data = mock.response_data
             if response_data:
-                api_log = APILog.objects.create(
-                    address=mock.destination_address,
-                    response=response.content,
+                ResponseContent.objects.create(
+                    destination_address=mock.destination_address,
+                    content=response.content,
+                    mocker=mock,
                 )
-                mock.api_log = api_log
-                mock.save()
 
                 is_content_type_json = mock.allowed_content_type == CONTENT_TYPES.APP_JSON
                 # TODO: make content=json.dump(response) ?

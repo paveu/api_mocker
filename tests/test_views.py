@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, Client, RequestFactory
 
 from apimocker.mocker.enums import CONTENT_TYPES, SUCCESS_FORM_ACTION_MSG, HTTP_METHODS
-from apimocker.mocker.models import Mocker, APILog
+from apimocker.mocker.models import Mocker, ResponseContent
 from tests.utils.factories import MockerFactory, ResponseSettingFactory
 
 
@@ -68,4 +68,4 @@ class MockedAPI(TestCase):
         self.assertEqual(len(responses.calls), 2)
 
         # Response content saved to database
-        self.assertEqual(APILog.objects.count(), 1)
+        self.assertEqual(ResponseContent.objects.count(), 1)
