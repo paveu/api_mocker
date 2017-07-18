@@ -6,9 +6,9 @@ API Mocker is a Django powered API mock application. It can hide original API fr
 
 # Features
 
-  - Possibility to set and limit HTTP Content-types along with their methods for a mocked API.
+  - Setting and limiting HTTP Content-types along with their methods for a mocked API.
   - API PUSH Callbacks. In case of an error or success it can return callback message(push) to defined client address. Push messages are sent asynchronous.
-  - API responses are stored in database.
+  - API content responses are stored in database.
 
 ### Tech
 
