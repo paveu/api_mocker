@@ -1,9 +1,8 @@
 .env
-*local.py
 local.py
-apimocker/**/local.py
 local*
+apimocker/settings/local*
+apimocker/settings/vars/local*
+apimocker/settings/envs/local*
 .git
-*.pyc
-.cache
-frontend
+frontend/node_modules/*
