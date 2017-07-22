@@ -15,6 +15,8 @@ API Mocker is a Django powered API mock application. It can hide original API fr
 API Mocker uses a number of open source projects to work properly:
 
 * [Django](https://www.djangoproject.com/) - free and open-source Python web framework.
+* [webpack](https://webpack.github.io/) - webpack is a module bundler this means webpack takes modules with dependencies and emits static assets representing those modules.
+* [Docker](https://www.docker.com/) - open platform for developers and sysadmins to build, ship, and run distributed applications, whether on laptops, data center VMs, or the cloud.
 * [Celery](http://www.celeryproject.org/) - open source asynchronous task queue or job queue which is based on distributed message passing.
 * [Requests](http://docs.python-requests.org/en/master/) - Python HTTP library, released under the Apache2 License.
 * [django-crispy-forms](https://django-crispy-forms.readthedocs.io/en/latest/) - Django application that lets you easily build, customize and reuse forms using your favorite CSS framework, without writing template code and without having to take care of annoying details.
@@ -30,7 +32,6 @@ Want to contribute? Great!. Pull requests are welcome!
 
  - Add timeout for requests within mocker model
  - Save cookies to database if exist
- - Add webpack
  - Add REST endpoints
  - Logging to file or Kibana
  - Check if Event Hooks could be used as a replacement of implemented callbacks
