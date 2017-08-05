@@ -21,7 +21,7 @@ if (env == 'production') {
     static_path = path.resolve("/static");
 }
 else {
-    static_path = path.resolve("../reporting/static/");
+    static_path = path.resolve("../apimocker/static/");
 }
 
 module.exports = {
