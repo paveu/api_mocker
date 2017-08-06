@@ -15,13 +15,13 @@ var PATHS = {
 var fontsPath = PATHS.FONTS + filename;
 var imagesPath = PATHS.IMAGES + filename;
 var env = process.env.ENVIRONMENT;
-
 var static_path;
+
 if (env == 'production') {
     static_path = path.resolve("/static");
 }
 else {
-    static_path = path.resolve("../reporting/static/");
+    static_path = path.resolve("../apimocker/static/");
 }
 
 module.exports = {
