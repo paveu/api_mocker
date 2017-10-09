@@ -7,13 +7,8 @@
 	<div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
 	{% endfor %}
 
-    <div class="col-sm-6 col-sm-offset-3">
-	  <h1>Mock your API</h1>
-	  <br />
-      <div class="well" style="background: white">
+    <div class="well" style="background: white">
         {% crispy form %}
-      </div>
-
     </div>
 
 {% endblock %}

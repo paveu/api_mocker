@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Mocker, ResponseSetting, ResponseLog
+from .models import Mocker, ResponseSetting, ResponseLog, CustomHeader
 
 
 class MockerAdmin(admin.ModelAdmin):
@@ -28,6 +28,12 @@ class ResponseLogAdmin(admin.ModelAdmin):
     ordering = ('-create_date',)
 
 
+class CustomHeaderAdmin(admin.ModelAdmin):
+    date_hierarchy = 'create_date'
+    ordering = ('-create_date',)
+
+
 admin.site.register(Mocker, MockerAdmin)
 admin.site.register(ResponseSetting, ResponseSettingAdmin)
 admin.site.register(ResponseLog, ResponseLogAdmin)
+admin.site.register(CustomHeader, CustomHeaderAdmin)
