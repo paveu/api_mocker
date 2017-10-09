@@ -23,7 +23,7 @@ class CreatingMocker(TestCase):
             'allowed_content_type': CONTENT_TYPES.APP_JSON,
             'callback_address': 'https://flask-app-pawelste.c9users.io/callback/',
             'callback_content_type': CONTENT_TYPES.APP_JSON,
-            'response_data': 1,
+            'response_setting': 1,
         }
         response = self.client.post(reverse('process_mock_form_view'), data)
         self.assertTemplateUsed(response, 'action_status.html')
@@ -40,7 +40,7 @@ class MockedAPIUsage(TestCase):
     @responses.activate
     def test_api_post_with_json_contenttype_with_json_callback(self):
         self.mocker = MockerFactory(
-            allowed_http_method=HTTP_METHODS.POST,
+            allowed_http_method=[HTTP_METHODS.POST],
             allowed_content_type=CONTENT_TYPES.APP_JSON,
             callback_content_type=CONTENT_TYPES.APP_JSON,
         )
@@ -49,13 +49,12 @@ class MockedAPIUsage(TestCase):
             self.mocker.destination_address,
             status=200,
             content_type=CONTENT_TYPES.APP_JSON,
-            json={},
+            json={'error': 'not found'},
         )
         responses.add(
             responses.POST,
             self.mocker.callback_address,
             status=200,
-            content_type=CONTENT_TYPES.APP_JSON,
         )
         response = self.client.post(
             path=reverse('mocked_api_view', args=[self.mocker.hashed_id, '']),

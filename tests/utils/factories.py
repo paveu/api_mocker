@@ -22,4 +22,4 @@ class MockerFactory(factory.DjangoModelFactory):
     mocked_address = 'http://localhost:8000/RGNhou/'
     hashed_id = 'RGNhou'
 
-    response_data = factory.SubFactory(ResponseSettingFactory)
+    response_setting = factory.SubFactory(ResponseSettingFactory)

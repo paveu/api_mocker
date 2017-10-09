@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     # third party apps
     'crispy_forms',
+    'multiselectfield',
     'raven.contrib.django.raven_compat',
     # main app
     'apimocker.mocker',

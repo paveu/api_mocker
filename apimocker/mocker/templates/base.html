@@ -23,31 +23,33 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Api Mocker</a>
+          <a class="navbar-brand" href="#">API Mocker - a forward proxy service</a>
         </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-
-          </ul>
-        </div><!--/.nav-collapse -->
       </div>
     </nav>
-
-    <div class="container container-fluid">
+    <br><br><br><br>
+    <div class="container">
 		<div class="row">
-		<br /><br /><br />
+            <div class="col-md-6 col-sm-6">
+                <h3>API Mocker is a Django powered API proxy mock service</h3>
+                <br>
+                <p class="lead">
+                    <h3>Features:</h3>
+                    <ul style="font-size: 1.5rem;">
+                        <li>Mock JSON API</li>
+                        <li>Add custom headers</li>
+                        <li>Push response callback</li>
+                        <li>Record API response content and header in database</li>
+                        <li>Supports for POST/GET/PATCH/PUT/DELETE/HEAD/OPTIONS HTTP methods</li>
+                        <li>Set your own response status code</li>
+                    </ul>
+                </p>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                {% block content %}
+	            {% endblock %}
+            </div>
 
-	    {% block content %}
-
-	    {% endblock %}
 		</div>
     </div><!-- /.container -->
 
