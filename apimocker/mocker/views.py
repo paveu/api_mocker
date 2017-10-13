@@ -20,10 +20,18 @@ class CreateMockerView(CreateView):
     form_class = MockerForm
     model = Mocker
 
+    def dispatch(self, request, *args, **kwargs):
+        logger.info("create-mocker-view")
+        return super(CreateMockerView, self).dispatch(request, *args, **kwargs)
+
 
 class ProcessMockFormView(FormView):
     form_class = MockerForm
     template_name = "action_status.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        logger.info("process-mock-form-view")
+        return super(ProcessMockFormView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         hashed_id = get_hashed_id()
@@ -49,6 +57,7 @@ class ProcessMockFormView(FormView):
 class ResolveMockedAddressView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
+        logger.info("resolve-mocked-address-view")
         return super(ResolveMockedAddressView, self).dispatch(request, *args, **kwargs)
 
     def _process(self, request, hashed_id):

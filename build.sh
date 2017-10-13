@@ -21,16 +21,20 @@ docker system prune --force
 # docker-machine env default
 # eval $(docker-machine env default)
 # docker-machine ssh default "docker node ls"
-# docker swarm init
 
 ## Recreate Swarm
+# docker-machine ssh default sudo sysctl -w vm.max_map_count=262144
 # docker-machine ssh default "docker swarm leave --force"
 # docker-machine ssh default "docker swarm init --advertise-addr 192.168.99.100"
-# docker-machine ssh default "mkdir ./data" ### for apimocker redis
+
+
 # docker-machine ssh myvm1 "docker swarm leave --force"
+# docker-machine ssh myvm1 "docker swarm join --token SWMTKN-1-0ft3r53r1p5804e66hq51pg9da06f4q4aolzbtbm8w2h4fhm82-dbgyct49kph32vlnx7gdyn0we 192.168.99.100:2377"
+# docker-machine ssh myvm1 sudo sysctl -w vm.max_map_count=262144
+
 # docker-machine ssh myvm2 "docker swarm leave --force"
-# docker-machine ssh myvm1 "docker swarm join --token SWMTKN-1-5nlpfvymogwvj7poel5ak1y1ykomvqe3p32v41nyqj9qlo029c-5jjsqbt7e0b8en55npih3n5g2 192.168.99.100:2377"
-# docker-machine ssh myvm2 "docker swarm join --token SWMTKN-1-5nlpfvymogwvj7poel5ak1y1ykomvqe3p32v41nyqj9qlo029c-5jjsqbt7e0b8en55npih3n5g2 192.168.99.100:2377"
+# docker-machine ssh myvm2 "docker swarm join --token SWMTKN-1-2n3bhmylapbxm6wln0ictczpgka7bmr6rfvtsnymcteqorewxg-bbekj5nyro2yc6tkfrow7plkc 192.168.99.100:2377"
+# docker-machine ssh myvm2 sudo sysctl -w vm.max_map_count=262144
 
 ### Remove and deploy stack
 # docker stack rm getstartedlab
