@@ -27,7 +27,6 @@ docker system prune --force
 # docker-machine ssh default "docker swarm leave --force"
 # docker-machine ssh default "docker swarm init --advertise-addr 192.168.99.100"
 
-
 # docker-machine ssh myvm1 "docker swarm leave --force"
 # docker-machine ssh myvm1 "docker swarm join --token SWMTKN-1-0ft3r53r1p5804e66hq51pg9da06f4q4aolzbtbm8w2h4fhm82-dbgyct49kph32vlnx7gdyn0we 192.168.99.100:2377"
 # docker-machine ssh myvm1 sudo sysctl -w vm.max_map_count=262144
