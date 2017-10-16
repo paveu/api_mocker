@@ -9,9 +9,14 @@
  - Added test for custom headers
  - Check if Event Hooks could be used as a replacement of implemented callbacks
 
-2) Todos backend
+2) Todos devops
+ - Logging to ELK (check if path to elasticsearch can be reached by hostname instead defined in docker-compose)
+ https://stackoverflow.com/questions/36151981/local-hostnames-for-docker-containers
  - Add REST endpoints
- - Logging to file or Kibana
+ - Continuous Delivery
 
 2) Upgrade project requirements
 3) Check if rabbitmq would be better alternative for celery broker
+
+
+
