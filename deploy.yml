@@ -1,0 +1,159 @@
+version: "3"
+
+services:
+  traefik:
+    image: traefik
+    command: --web --docker --docker.swarmmode --docker.watch --docker.domain=traefik --logLevel=DEBUG
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/null:/traefik.toml
+
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - backend
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+  http:
+    image: emilevauge/whoami
+    networks:
+      - frontend
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.backend=http"
+        - "traefik.port=80"
+        - "traefik.frontend.rule=PathPrefixStrip:/http/"
+        - "traefik.docker.network=frontend"
+networks:
+  frontend:
+    external: true
+  backend:
+    external: false
+
+
+
+#version: "3.3"
+#
+#services:
+#  traefik:
+#    image: paveu/reverse-proxy:1.9
+#    networks:
+#      - backend
+#    ports:
+#      - "80:80"
+#      - "8080:8080"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    deploy:
+#      labels:
+#        - traefik.domain="docker.localhost"
+#      replicas: 1
+#      placement:
+#        constraints: [node.role == manager]
+#      restart_policy:
+#        condition: on-failure
+#  portainer:
+#    image: portainer/portainer
+#    ports:
+#      - "80"
+#    networks:
+#      - frontend
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    deploy:
+#      labels:
+#        - "traefik.backend=portainer"
+#        - "traefik.frontend.rule=Host:portainer.localhost"
+#        - "traefik.docker.network=frontend"
+#        - "traefik.port=80"
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints: [node.role == manager]
+#  demo:
+#    image: ehazlett/docker-demo
+#    networks:
+#      - frontend
+#    ports:
+#      - "8080"
+#    deploy:
+#      labels:
+#        - "traefik.backend=demo"
+#        - "traefik.frontend.rule=Host:demo.localhost"
+#        - "traefik.docker.network=frontend"
+#        - "traefik.port=8080"
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints: [node.role == manager]
+#  http:
+#    image: emilevauge/whoami
+#    networks:
+#      - frontend
+#    deploy:
+#      replicas: 1
+#      labels:
+#        - "traefik.backend=http"
+#        - "traefik.port=80"
+#        - "traefik.frontend.rule=PathPrefixStrip:/http/"
+#        - "traefik.docker.network=frontend"
+#networks:
+#  frontend:
+#    external: true
+#  backend:
+#    external: false
+
+#version: "3"
+#
+#services:
+#  traefik:
+#    image: traefik
+#    command: --web --docker --docker.swarmmode --docker.watch --docker.domain=traefik --logLevel=DEBUG
+#    ports:
+#      - "80:80"
+#      - "8080:8080"
+#      - "443:443"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - /dev/null:/traefik.toml
+#    labels:
+#      - "traefik.enable=false"
+#    networks:
+#      - public
+#    deploy:
+#      replicas: 1
+#      placement:
+#        constraints: [node.role == manager]
+#      restart_policy:
+#        condition: on-failure
+#  http:
+#    image: emilevauge/whoami
+#    networks:
+#      - traefik_public
+#    deploy:
+#      replicas: 1
+#      labels:
+#        - "traefik.backend=http"
+#        - "traefik.port=80"
+#        - "traefik.frontend.rule=PathPrefixStrip:/http/"
+#        - "traefik.docker.network=traefik_public"
+#
+#networks:
+#  traefik_public:
+#    external: true
+#networks:
+#  public:
+#    driver: overlay
+#    ipam:
+#      driver: default
+#      config:
+#      - subnet: 10.1.0.0/24

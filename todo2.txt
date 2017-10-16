@@ -10,8 +10,6 @@
  - Check if Event Hooks could be used as a replacement of implemented callbacks
 
 2) Todos devops
- - Logging to ELK (check if path to elasticsearch can be reached by hostname instead defined in docker-compose)
- https://stackoverflow.com/questions/36151981/local-hostnames-for-docker-containers
  - Add REST endpoints
  - Continuous Delivery
 

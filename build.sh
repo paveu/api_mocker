@@ -17,31 +17,50 @@ docker push ${IMAGE}:latest
 
 docker system prune --force
 
-### Swarm - Master node (manager)
-# docker-machine env default
-# eval $(docker-machine env default)
-# docker-machine ssh default "docker node ls"
+############ Swarm Mode Cluster configuration
+### Debug
+### in case of CA problems with docker-machines
+# unset ${!DOCKER*}
+#
+#### set up virtual machines
+# docker-machine create -d virtualbox manager
+# docker-machine create -d virtualbox worker1
+# docker-machine create -d virtualbox worker2
+# eval $(docker-machine env manager)
+#
+#### leave swarm mode if they joined in
+# docker-machine ssh manager "docker swarm leave --force"
+# docker-machine ssh worker1 "docker swarm leave --force"
+# docker-machine ssh worker2 "docker swarm leave --force"
+#
+#### Configure Swarm Mode Cluster
+# docker-machine ssh manager "docker swarm init --listen-addr $(docker-machine ip manager) --advertise-addr $(docker-machine ip manager)"
+# export worker_token=$(docker-machine ssh manager "docker swarm join-token worker -q")
+# docker-machine ssh worker1 "docker swarm join --token=${worker_token} --listen-addr $(docker-machine ip worker1) --advertise-addr $(docker-machine ip worker1) $(docker-machine ip manager)"
+# docker-machine ssh worker2 "docker swarm join --token=${worker_token} --listen-addr $(docker-machine ip worker2) --advertise-addr $(docker-machine ip worker2) $(docker-machine ip manager)"
+# docker-machine ssh manager "docker node ls"
+#
+#### Create networks
+# docker-machine ssh manager "docker network remove frontend"
+# docker-machine ssh manager "docker network remove backend"
+# docker-machine ssh manager "docker network create --driver=overlay frontend"
+# docker-machine ssh manager "docker network create --driver=overlay backend"
+#
+#### Set new max_map_count value for ELK
+# docker-machine ssh manager sudo sysctl -w vm.max_map_count=262144
+# docker-machine ssh worker1 sudo sysctl -w vm.max_map_count=262144
+# docker-machine ssh worker2 sudo sysctl -w vm.max_map_count=262144
+#
+#### Add 600 privilages to acme json
+# cd apimocker/settings/external/traefik
+# chmod 600 acme.json
 
-## Recreate Swarm
-# docker-machine ssh default sudo sysctl -w vm.max_map_count=262144
-# docker-machine ssh default "docker swarm leave --force"
-# docker-machine ssh default "docker swarm init --advertise-addr 192.168.99.100"
-
-
-# docker-machine ssh myvm1 "docker swarm leave --force"
-# docker-machine ssh myvm1 "docker swarm join --token SWMTKN-1-0ft3r53r1p5804e66hq51pg9da06f4q4aolzbtbm8w2h4fhm82-dbgyct49kph32vlnx7gdyn0we 192.168.99.100:2377"
-# docker-machine ssh myvm1 sudo sysctl -w vm.max_map_count=262144
-
-# docker-machine ssh myvm2 "docker swarm leave --force"
-# docker-machine ssh myvm2 "docker swarm join --token SWMTKN-1-2n3bhmylapbxm6wln0ictczpgka7bmr6rfvtsnymcteqorewxg-bbekj5nyro2yc6tkfrow7plkc 192.168.99.100:2377"
-# docker-machine ssh myvm2 sudo sysctl -w vm.max_map_count=262144
-
-### Remove and deploy stack
-# docker stack rm getstartedlab
-# docker stack deploy -c docker-compose.yml getstartedlab
+### Remove and deploy new stack
+# docker stack rm testapp
+# docker stack deploy -c docker-compose.yml testapp
 
 ### After we make change to compose file we can updated all services by running
-# docker stack deploy -c docker-compose.yml getstartedlab
+# docker stack deploy -c docker-compose.yml testapp
 
 ### New image scenario
 # Step 1) build this script
