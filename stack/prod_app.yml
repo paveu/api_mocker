@@ -1,0 +1,72 @@
+version: "3"
+
+services:
+  web:
+    image: docker.io/paveu/apimocker
+    command: /base/entry web
+    networks:
+      - frontend
+    depends_on:
+      - cache
+      - celery
+    environment:
+      # Values present in the environment at runtime will always override those defined inside the .env file.
+      # Similarly, values passed via command-line arguments take precedence as well.
+      # .env file must be created with following env variables
+      - ENVIRONMENT=production
+      - DATABASE_MOCKER_URL
+      - RAVEN_CONFIG_DSN
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=web"
+        - "traefik.port=8443"
+        - "traefik.frontend.rule=PathPrefixStrip:/"
+        - "traefik.frontend.rule=Host:mocker.paveu.pl"
+        - "traefik.frontend.entryPoints=http,https"
+        - "traefik.docker.network=frontend"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+  cache:
+    image: redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    networks:
+      - frontend
+    volumes:
+      # Make sure your shell is configured to talk to default.
+      # Create a ./data directory on the manager:
+      # docker-machine ssh default "mkdir ./data"
+      # The volume you created that lets the container access ./data (on the host)
+      # as /data (inside the Redis container). While containers come and go,
+      # the files stored on ./data on the specified host will persist, enabling continuity.
+      - data:/redis_data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+  celery:
+    image: docker.io/paveu/apimocker
+    command: /base/entry celery_worker_and_beat
+    networks:
+      - frontend
+    depends_on:
+      - cache
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_MOCKER_URL
+      - RAVEN_CONFIG_DSN
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+networks:
+  frontend:
+    external: true
+volumes:
+  data:
+    driver: local

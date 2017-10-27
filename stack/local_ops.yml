@@ -1,0 +1,72 @@
+version: "3"
+
+services:
+  portainer:
+    image: portainer/portainer
+    networks:
+      - frontend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=portainer"
+        - "traefik.port=9000"
+        - "traefik.frontend.rule=PathPrefixStrip:/"
+        - "traefik.frontend.rule=Host:portainer.example.com"
+        - "traefik.docker.network=frontend"
+      placement:
+        constraints: [node.role == manager]
+  elasticsearch:
+    hostname: elasticsearch
+    image: docker.io/paveu/elasticsearch
+    networks:
+      - frontend
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: '-Xms256m -Xmx256m'
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+  logstash:
+    hostname: logstash
+    image: docker.io/paveu/logstash
+    command: -f /usr/share/logstash/pipeline/logstash.conf
+    ports:
+        - "5000:5000/tcp"
+        - "5044:5044/tcp"
+        - "5000:5000/udp"
+        - "5044:5044/udp"
+    depends_on:
+      - elasticsearch
+    networks:
+      - frontend
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+  kibana:
+    image: docker.io/paveu/kibana
+    depends_on:
+      - elasticsearch
+    networks:
+      - frontend
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=kibana"
+        - "traefik.port=5601"
+        - "traefik.frontend.rule=Host:elk.example.com"
+        - "traefik.docker.network=frontend"
+      placement:
+        constraints: [node.role == manager]
+networks:
+  frontend:
+    external: true
+volumes:
+  esdata:
+    driver: local

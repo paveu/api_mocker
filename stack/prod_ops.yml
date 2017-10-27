@@ -1,0 +1,78 @@
+version: "3"
+
+services:
+  portainer:
+    image: portainer/portainer
+    networks:
+      - frontend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=portainer"
+        - "traefik.port=9000"
+        - "traefik.frontend.rule=PathPrefixStrip:/"
+        - "traefik.frontend.entryPoints=http,https"
+        - "traefik.frontend.rule=Host:portainer.paveu.pl"
+        - "traefik.docker.network=frontend"
+      placement:
+        constraints: [node.role == manager]
+  elasticsearch:
+    hostname: elasticsearch
+    image: docker.io/paveu/elasticsearch
+    networks:
+      - frontend
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: '-Xms256m -Xmx256m'
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+  logstash:
+    hostname: logstash
+    image: docker.io/paveu/logstash
+    command: -f /usr/share/logstash/pipeline/logstash.conf
+    ports:
+        - "5000:5000/tcp"
+        - "5044:5044/tcp"
+        - "5000:5000/udp"
+        - "5044:5044/udp"
+    depends_on:
+      - elasticsearch
+    networks:
+      - frontend
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+  kibana:
+    image: docker.io/paveu/kibana
+    depends_on:
+      - elasticsearch
+    networks:
+      - frontend
+    deploy:
+      replicas: 1
+      # In terms of label 'traefik.frontend.auth.basic' - I've found the answer : you have to double every "$" character.
+      # For example: "traefik.frontend.auth.basic=test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
+      # wille become: "traefik.frontend.auth.basic=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=kibana"
+        - "traefik.frontend.rule=Host:elk.paveu.pl"
+        - "traefik.port=5601"
+        - "traefik.frontend.entryPoints=http,https"
+        - "traefik.docker.network=frontend"
+        - "traefik.frontend.auth.basic=admin:$$apr1$$stBuFgS4$$d9ypu8eq.vwVq4lbAL2RU0"
+      placement:
+        constraints: [node.role == manager]
+networks:
+  frontend:
+    external: true
+volumes:
+  esdata:
+    driver: local

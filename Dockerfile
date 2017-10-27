@@ -5,12 +5,13 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash && apt-get install -y n
 ENV APP_NAME apimocker
 ENV CELERY_APP apimocker
 ENV DJANGO_SETTINGS_MODULE apimocker.settings
+ENV ENVIRONMENT production
 
-ADD /requirements/requirements.txt /app/requirements.txt
-RUN pip install -r /app/requirements.txt
+ADD /requirements/base.txt /app/base.txt
+RUN pip install -r /app/base.txt
 
 WORKDIR /app
 ADD . /app/
 
-RUN cd frontend && npm config set registry http://registry.npmjs.org/ && npm set strict-ssl falsenpm install && npm install && npm rebuild node-sass && ENVIRONMENT=production npm run build
-RUN ENVIRONMENT=production python manage.py collectstatic --no-input --link -v 0
+RUN cd frontend && npm config set registry http://registry.npmjs.org/ && npm set strict-ssl falsenpm install && npm install && npm rebuild node-sass && npm run build
+RUN python manage.py collectstatic --no-input --link -v 0
