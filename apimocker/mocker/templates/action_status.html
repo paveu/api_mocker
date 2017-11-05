@@ -11,6 +11,11 @@
         <li>Original API address: <a href="{{ destination_url }}">{{ destination_url }}</a></li>
         <li>Mocked API address: <a href="{{ mocked_url }}"> {{ mocked_url }}</a></li>
     </ul>
+    <h3>Example usage in Python's Requests library:</h3>
+    <code>
+    requests.get("{{ mocked_url }}", headers={"Content-type": "application/json"})
+    </code>
+    <br><br>
 
     <a href="{% url 'home' %}">Go to the Home page</a>
 
