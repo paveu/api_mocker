@@ -31,7 +31,6 @@ pip-log.txt
 *.log
 *.pot
 local_settings.py
-local*
 
 .idea
 

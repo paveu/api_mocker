@@ -9,73 +9,80 @@ IMAGE=paveu/apimocker
 
 docker build -t ${IMAGE}:${VERSION} . | tee build.log || exit 1
 ID=$(tail -1 build.log | awk '{print $3;}')
+docker tag $ID ${IMAGE}:${SHA:0:7}
 docker tag $ID ${IMAGE}:latest
 docker images | grep ${IMAGE}
 
-docker push ${IMAGE}:$ID
+docker push ${IMAGE}:${SHA:0:7}
 docker push ${IMAGE}:latest
 
 docker system prune --force
 
-############ Swarm Mode Cluster configuration
-### Debug
-### in case of CA problems with docker-machines
-# unset ${!DOCKER*}
-#
-#### set up virtual machines
-# docker-machine create -d virtualbox manager
+##### Digital Ocean docker machine ######
+#    export DIGITALOCEAN_ACCESS_TOKEN=""
+#    export DIGITALOCEAN_IMAGE="ubuntu-16-04-x64"
+#    export DIGITALOCEAN_REGION="fra1"
+#    export DIGITALOCEAN_SIZE="4gb"
+#    export DIGITALOCEAN_PRIVATE_NETWORKING="true"
+#    export DIGITALOCEAN_IPV6="true"
+#    docker-machine create --driver digitalocean --digitalocean-image $DIGITALOCEAN_IMAGE --digitalocean-region $DIGITALOCEAN_REGION --digitalocean-size $DIGITALOCEAN_SIZE --digitalocean-ipv6 --digitalocean-private-networking managerprod
+#    eval $(docker-machine env managerprod)
+#    docker-machine ssh managerprod "docker swarm init --listen-addr $(docker-machine ip managerprod) --advertise-addr $(docker-machine ip managerprod)"
+#    docker network create --driver overlay frontend
+#    docker-machine ssh managerprod sudo sysctl -w vm.max_map_count=262144
+#    docker stack deploy balancer -c stack/prod_balancer.yml
+#    docker stack deploy ops -c stack/prod_ops.yml
+#    docker stack deploy app -c stack/prod_app.yml
+
+##### Configure Swarm Mode Cluster - locally
+### Create Manager machine with at least 2GB RAM!!!!!!!! It is needed for ELK stack (Kibana)
+# docker-machine create -d managerlocal
 # docker-machine create -d virtualbox worker1
-# docker-machine create -d virtualbox worker2
-# eval $(docker-machine env manager)
-#
-#### leave swarm mode if they joined in
-# docker-machine ssh manager "docker swarm leave --force"
+# eval $(docker-machine env managerlocal)
+
+# Leave Swarm mode if they joined in
+# docker-machine ssh managerlocal "docker swarm leave --force"
 # docker-machine ssh worker1 "docker swarm leave --force"
 # docker-machine ssh worker2 "docker swarm leave --force"
-#
-#### Configure Swarm Mode Cluster
-# docker-machine ssh manager "docker swarm init --listen-addr $(docker-machine ip manager) --advertise-addr $(docker-machine ip manager)"
-# export worker_token=$(docker-machine ssh manager "docker swarm join-token worker -q")
-# docker-machine ssh worker1 "docker swarm join --token=${worker_token} --listen-addr $(docker-machine ip worker1) --advertise-addr $(docker-machine ip worker1) $(docker-machine ip manager)"
-# docker-machine ssh worker2 "docker swarm join --token=${worker_token} --listen-addr $(docker-machine ip worker2) --advertise-addr $(docker-machine ip worker2) $(docker-machine ip manager)"
-# docker-machine ssh manager "docker node ls"
-#
-#### Create networks
-# docker-machine ssh manager "docker network remove frontend"
-# docker-machine ssh manager "docker network remove backend"
-# docker-machine ssh manager "docker network create --driver=overlay frontend"
-# docker-machine ssh manager "docker network create --driver=overlay backend"
-#
+
+# docker-machine ssh managerlocal "docker swarm init --listen-addr $(docker-machine ip managerlocal) --advertise-addr $(docker-machine ip managerlocal)"
+# export worker_token=$(docker-machine ssh managerlocal "docker swarm join-token worker -q")
+# docker-machine ssh worker1 "docker swarm join --token=${worker_token} --listen-addr $(docker-machine ip worker1) --advertise-addr $(docker-machine ip worker1) $(docker-machine ip managerlocal)"
+# docker-machine ssh worker2 "docker swarm join --token=${worker_token} --listen-addr $(docker-machine ip worker2) --advertise-addr $(docker-machine ip worker2) $(docker-machine ip managerlocal)"
+# docker-machine ssh managerlocal "docker node ls"
+
+# Create network for Swarm Cluster
+# docker network create --driver overlay frontend
+
 #### Set new max_map_count value for ELK
-# docker-machine ssh manager sudo sysctl -w vm.max_map_count=262144
+# docker-machine ssh managerlocal sudo sysctl -w vm.max_map_count=262144
 # docker-machine ssh worker1 sudo sysctl -w vm.max_map_count=262144
 # docker-machine ssh worker2 sudo sysctl -w vm.max_map_count=262144
-#
-#### Add 600 privilages to acme json
-# cd apimocker/settings/external/traefik
-# chmod 600 acme.json
 
-### Remove and deploy new stack
-# docker stack rm testapp
-# docker stack deploy -c docker-compose.yml testapp
+### create new stack locally
+# docker stack deploy balancer -c stack/local_balancer.yml
+# docker stack deploy ops -c stack/local_ops.yml
+# docker stack deploy app -c stack/local_app.yml
 
-### After we make change to compose file we can updated all services by running
-# docker stack deploy -c docker-compose.yml testapp
+### Remove new stack
+# docker stack rm balancer
+# docker stack rm ops
+# docker stack rm app
 
 ### New image scenario
-# Step 1) build this script
-# Step 2) docker service update --force getstartedlab_web
+# Step 1) build this image
+# Step 2) docker service update --force app_web
 
-### Scale services -> 'getstartedlab_web' service
+### Scale services -> 'app_web' service
 # docker service ls
-# docker service scale getstartedlab_web=3
+# docker service scale app_web=3
 
 ### Service inspection
-# docker stack ps getstartedlab # stack visuaalization
-# docker stack services getstartedlab
-# docker service inspect getstartedlab_web
-# docker service ps getstartedlab_web
-# docker service logs getstartedlab_web --details -t
+# docker stack ps app_web # stack visuaalization
+# docker stack services app_web
+# docker service inspect app_web
+# docker service ps app_web
+# docker service logs app_web --details -t
 # docker container ls
 # docker stats --all
 
@@ -93,6 +100,10 @@ docker system prune --force
 #
 # >$ docker exec -it c30d4e94f5e4 bash
 # root@e53bff8bebfc:/#
+
+############ Swarm Mode Cluster configuration - local
+### Debug - in case of CA problems with docker-machines
+# unset ${!DOCKER*}
 
 ####################################
 #### Other commands reference ######

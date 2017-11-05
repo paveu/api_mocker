@@ -1,20 +1,20 @@
-1) Todos application
+1) Todos dev
+
  - Add custom API credentials model
  - Add form captcha
  - Add possiblity to limit api calls and/or throttling
  - Add possibility to view statiscs and/or go to panel via *secret* pass in link
  - Analytics model(Call Log) for counting how many times API was used. To catch if there was error while using it
  - (nice to have) Add timeout for requests within mocker model
- - Add test to check if I get 403 if I use not allowed HTTP methos
+ - Add test to check if I get 403 if I use not allowed HTTP methods
  - Added test for custom headers
  - Check if Event Hooks could be used as a replacement of implemented callbacks
 
 2) Todos devops
+
+ - Send Traefik logs to Logstach via filebeat
+ - Configure Redis as Django's Cache Engine and Session Storage Manager
+ - Add Rabbitmq as main broker (replacement of Redis in this case)
  - Add REST endpoints
- - Continuous Delivery
 
 2) Upgrade project requirements
-3) Check if rabbitmq would be better alternative for celery broker
-
-
-

@@ -134,10 +134,10 @@ module.exports = {
             disable: false,
             allChunks: true
         }),
-        new CopyWebpackPlugin([{
-            from: './src/img',
-            to: 'img',
-        }]),
+        // new CopyWebpackPlugin([{
+        //     from: './src/',
+        //     to: 'img',
+        // }]),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",

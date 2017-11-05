@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  traefik:
+    image: docker.io/paveu/reverseproxy
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - frontend
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=traefik"
+        - "traefik.port=8080"
+        - "traefik.frontend.rule=PathPrefixStrip:/"
+        - "traefik.frontend.rule=Host: paveu.pl"
+        - "traefik.frontend.entryPoints=http,https"
+        - "traefik.docker.network=frontend"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+networks:
+  frontend:
+    external: true
